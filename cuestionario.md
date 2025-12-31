@@ -1,14 +1,12 @@
 # cuestionario para karina
 
 ## en base a los apuntes 
-- como haces la conciliacion bancaria?(explicar que es la conciliciacion bancaria) detallala lo paso por paso (axiomas)
+
+
 - como se calcula el prorrateo
-- mostranos el drive
-- mostranos como se mandan los mails(los mismos mails)
-- cuando no pagan, como lo gestionas?
-- explicanos tu expensa
 - los saldos contemplan el interes
 - como se calcula el redondeo
+
 ## preguntas de gemini
 
 - Existe un único porcentaje (coeficiente) por unidad o manejan múltiples?
@@ -33,7 +31,6 @@
 
 ## preguntas de chatgpt
 
-- ¿Qué es lo que más le duele del sistema actual?
 
 - ¿Cuántos consorcios maneja hoy?
 
@@ -134,3 +131,17 @@
 - ¿Se deben guardar históricos por X años?
 
 - “Si este sistema funcionara perfecto dentro de 1 año, ¿qué cosas estaría haciendo por usted que hoy no puede?" 
+
+- como es tu flujo de trabajo habitual?
+
+- mostranos el drive
+- mostranos como se mandan los mails(los mismos mails)
+- explicanos tu expensa
+
+- cuando no pagan, como lo gestionas?
+
+- como haces la conciliacion bancaria?(explicar que es la conciliciacion bancaria) detallala lo paso por paso (axiomas)
+
+- definir las constantes  
+ 
+- ¿Qué es lo que más le duele del sistema actual?
