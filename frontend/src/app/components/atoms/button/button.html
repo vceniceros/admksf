@@ -1,0 +1,4 @@
+<button class="button" [ngClass]="{ active: isActive }" (click)="onClick()">
+  <app-icon [iconHref]="iconHref" [size]="iconSize" [color]="iconColor"></app-icon>
+  <app-label [text]="label" [color]="labelColor"></app-label>
+</button>
