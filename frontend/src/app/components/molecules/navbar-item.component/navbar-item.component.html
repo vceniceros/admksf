@@ -1,0 +1,4 @@
+<div class="navbar-item" [ngClass]="{ active: isActive }">
+  <app-icon [iconHref]="iconHref" [size]="size" [color]="isActive ? '#2563EB' : iconColor"></app-icon>
+  <app-label [text]="label" [color]="isActive ? '#2563EB' : '#000000'" fontSize="16px"></app-label>
+</div>

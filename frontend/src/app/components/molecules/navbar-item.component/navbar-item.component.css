@@ -1,0 +1,17 @@
+.navbar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar-item.active {
+  background-color: #f0f4ff; 
+}
+
+.navbar-item:hover {
+  background-color: #e6f0ff; 
+}
