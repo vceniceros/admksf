@@ -1,0 +1,21 @@
+<nav 
+  class="sidebar w-64 bg-white border-r border-gray-200 transition-transform duration-300 flex-shrink-0 md:translate-x-0 md:static"
+  [class.-translate-x-full]="!isVisible"
+  [class.translate-x-0]="isVisible"> 
+  
+  <app-navbar-item 
+    iconHref="assets/img/sprite.svg#dashboard" 
+    label="Dashboard" 
+    size="24" 
+    iconColor="#000000" 
+    [isActive]="true">
+  </app-navbar-item>
+  
+  <app-navbar-item 
+    iconHref="assets/img/sprite.svg#profile" 
+    label="Propietarios" 
+    size="24" 
+    iconColor="#000000" 
+    [isActive]="false">
+  </app-navbar-item>
+</nav>

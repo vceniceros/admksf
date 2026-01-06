@@ -1,0 +1,38 @@
+.sidebar {
+  width: 240px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 8px;
+  height: 100%;
+}
+
+/* En mobile: fixed positioning y control de visibilidad */
+@media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 74px;
+    height: calc(100vh - 74px);
+    z-index: 50;
+  }
+  
+  /* En mobile, el sidebar oculto se mueve fuera de la pantalla */
+  .sidebar.-translate-x-full {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.translate-x-0 {
+    transform: translateX(0);
+  }
+}
+
+/* En desktop: static positioning, siempre visible */
+@media (min-width: 768px) {
+  .sidebar {
+    position: static !important;
+    height: 100%;
+    transform: translateX(0) !important; /* Forzar visibilidad en desktop */
+  }
+}
