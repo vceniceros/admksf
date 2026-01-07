@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Edificio San Martín",
+    "status": "ACTIVE",
+    "address": "Av. San Martín 1234, CABA",
+    "units": 48,
+    "owners": 45,
+    "imageUrl": "assets/img/edificio-sanmartin.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Torres del Parque",
+    "status": "ACTIVE",
+    "address": "Av. del Libertador 5678, CABA",
+    "units": 96,
+    "owners": 92,
+    "imageUrl": "assets/img/torres-del-parque.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Residencial Belgrano",
+    "status": "ACTIVE",
+    "address": "Calle Juramento 789, CABA",
+    "units": 32,
+    "owners": 30,
+    "imageUrl": "assets/img/residencial-belgrano.jpg"
+  }
+]

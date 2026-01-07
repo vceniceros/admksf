@@ -1,0 +1,10 @@
+.main-no-sidebar {
+  padding: 0;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .main-no-sidebar {
+    padding: 0;
+  }
+}

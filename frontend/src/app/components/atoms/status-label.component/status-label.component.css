@@ -1,0 +1,25 @@
+.status-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.status-inactive {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.status-pending {
+  background-color: #f59e0b;
+  color: #ffffff;
+}

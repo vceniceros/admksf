@@ -1,0 +1,29 @@
+<div class="consortium-card">
+  <app-card-image [imageUrl]="consortium.imageUrl" [alt]="consortium.name"></app-card-image>
+  <div class="card-content">
+    <div class="card-header">
+      <app-label [text]="consortium.name" fontSize="18px" color="#1F2937"></app-label>
+      <app-status-label [status]="consortium.status"></app-status-label>
+    </div>
+    <div class="card-info">
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#map-pin" 
+        [text]="consortium.address"
+        fontSize="14px">
+      </app-info-row>
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#building" 
+        [text]="consortium.units + ' unidades'"
+        fontSize="14px">
+      </app-info-row>
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#profile" 
+        [text]="consortium.owners + ' propietarios'"
+        fontSize="14px">
+      </app-info-row>
+    </div>
+    <div class="card-action">
+      <app-icon iconHref="assets/img/sprites.svg#chevron-right" size="20" color="#9CA3AF"></app-icon>
+    </div>
+  </div>
+</div>

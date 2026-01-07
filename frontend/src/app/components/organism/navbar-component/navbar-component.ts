@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 
 import { IconComponent } from '../../atoms/icon.component/icon.component';
@@ -11,10 +12,11 @@ import { ButtonWithIconComponent } from '../../molecules/button-with-icon.compon
   templateUrl: './navbar-component.html',
   styleUrls: ['./navbar-component.css'],
   standalone: true,
-  imports: [IconComponent, LabelComponent, ButtonWithIconComponent],
+  imports: [CommonModule, IconComponent, LabelComponent, ButtonWithIconComponent],
 })
 export class NavbarComponent {
- @Output() toggleMenu = new EventEmitter<void>(); 
+  @Input() showMenuButton: boolean = true; // Controla si se muestra el botón del menú
+  @Output() toggleMenu = new EventEmitter<void>(); 
 
   onMenuClick() {
     this.toggleMenu.emit(); 
