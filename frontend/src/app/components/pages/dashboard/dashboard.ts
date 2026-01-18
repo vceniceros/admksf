@@ -6,17 +6,19 @@ import { ServicesService } from '../../../services/services.service';
 import { PaymentService } from '../../../services/payment.services';
 import { NotificationsService } from '../../../services/notifications.service';
 import { ConsortiumService } from '../../../services/consortium.service';
+import { EventsService } from '../../../services/events.service';
 import { DashboardSummary } from '../../../../models/dashboardSummary.model';
 import { ServiceStatusItem } from '../../../../models/services.model';
 import { Payment } from '../../../../models/payment.model';
 import { Notification } from '../../../../models/notifications.model';
 import { Consortium } from '../../../../models/consortium.model';
+import { Event } from '../../../../models/event.model';
 import { ConsortiumDashboardCardsComponent } from '../../molecules/consortium-dashboard-cards.component/consortium-dashboard-cards.component';
 import { ConsortiumServicesStatusCardComponent } from '../../molecules/consortium-services-status-card.component/consortium-services-status-card.component';
 import { ConsortiumLastPaymentCardFoundCardComponent } from '../../molecules/consortium-last-payment-card-found-card.component/consortium-last-payment-card-found-card.component';
 import { ConsortiumCollectionRatesCardComponent } from '../../molecules/consortium-collection-rates-card.component/consortium-collection-rates-card.component';
 import { ConsortiumOcupationRateCardComponent } from '../../molecules/consortium-ocupation-rate-card.component/consortium-ocupation-rate-card.component';
-import { ConsortiumReserveFoundCardComponent } from '../../molecules/consortium-reserve-found-card.component/consortium-reserve-found-card.component';
+import { ConsortiumEventsCardComponent } from '../../molecules/consortium-events-card.component/consortium-events-card.component';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
 
@@ -30,7 +32,7 @@ import { IconComponent } from '../../atoms/icon.component/icon.component';
     ConsortiumLastPaymentCardFoundCardComponent,
     ConsortiumCollectionRatesCardComponent,
     ConsortiumOcupationRateCardComponent,
-    ConsortiumReserveFoundCardComponent,
+    ConsortiumEventsCardComponent,
     LabelComponent,
     IconComponent
   ],
@@ -45,6 +47,7 @@ export class Dashboard implements OnInit {
   servicesStatus: ServiceStatusItem[] = [];
   lastPayments: Payment[] = [];
   notifications: Notification[] = [];
+  events: Event[] = [];
   consortium: Consortium | null = null;
 
   constructor(
@@ -54,7 +57,8 @@ export class Dashboard implements OnInit {
     private servicesService: ServicesService,
     private paymentService: PaymentService,
     private notificationsService: NotificationsService,
-    private consortiumService: ConsortiumService
+    private consortiumService: ConsortiumService,
+    private eventsService: EventsService
   ) {}
 
   ngOnInit() {
@@ -126,6 +130,11 @@ export class Dashboard implements OnInit {
     // Cargar notificaciones
     this.notificationsService.getNotifications(this.consortiumId).subscribe({
       next: (data) => this.notifications = data
+    });
+
+    // Cargar eventos
+    this.eventsService.getEvents(this.consortiumId).subscribe({
+      next: (data) => this.events = data
     });
   }
 }

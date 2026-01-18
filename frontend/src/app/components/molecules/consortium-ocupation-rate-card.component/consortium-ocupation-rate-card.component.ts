@@ -14,11 +14,11 @@ import { LabelComponent } from '../../atoms/label.component/label.component';
 export class ConsortiumOcupationRateCardComponent {
   @Input() occupancy!: OccupancyMetrics;
 
-  getOccupiedPercentage(): number {
+  getOwnerPercentage(): number {
     return Math.round((this.occupancy.occupied / this.occupancy.total) * 100);
   }
 
-  getRentedPercentage(): number {
+  getTenantPercentage(): number {
     return Math.round((this.occupancy.rented / this.occupancy.total) * 100);
   }
 

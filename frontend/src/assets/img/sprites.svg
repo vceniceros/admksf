@@ -89,12 +89,14 @@
   <symbol id="home" viewBox="0 0 24 24">
     <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
   </symbol>
-  <!-- Ícono de gastos (cuadrado con dólar) -->
+  <!-- Ícono de gastos (recibo con $) -->
   <symbol id="expenses" viewBox="0 0 24 24">
     <!-- Cuadrado -->
-    <rect x="5" y="5" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-    <!-- Símbolo de dólar -->
-    <path d="M12 8v8M10 11h2c1.1 0 2 .9 2 2s-.9 2-2 2h-2c-1.1 0-2-.9-2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <rect x="4" y="4" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <!-- Línea vertical del $ -->
+    <path d="M12 6.5v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <!-- S del $ -->
+    <path d="M14 9c0-1.1-.9-2-2-2s-2 .9-2 2c0 1.1.9 2 2 2s2 .9 2 2c0 1.1-.9 2-2 2s-2-.9-2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
   </symbol>
   <!-- Ícono de plus/suma -->
   <symbol id="plus" viewBox="0 0 24 24">

@@ -11,12 +11,6 @@ export interface CollectionMetrics {
   pendingAmount: number;
 }
 
-export interface ReserveFund {
-  currentAmount: number;
-  targetAmount: number;
-  percentage: number;
-}
-
 export interface OccupancyMetrics {
   total: number;
   occupied: number;
@@ -28,6 +22,5 @@ export interface DashboardSummary {
   consortiumId: number;
   financials: FinancialMetrics;
   collection: CollectionMetrics;
-  reserveFund: ReserveFund;
   occupancy: OccupancyMetrics;
 }

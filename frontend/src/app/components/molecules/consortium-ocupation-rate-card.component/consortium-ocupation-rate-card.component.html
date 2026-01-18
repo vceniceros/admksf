@@ -8,17 +8,17 @@
   <div class="occupation-list">
     <div class="occupation-item">
       <div class="occupation-dot green"></div>
-      <app-label text="Ocupadas" fontSize="14px" color="#1F2937"></app-label>
-      <app-label [text]="occupancy.occupied + ' (' + getOccupiedPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
+      <app-label text="Propietario" fontSize="14px" color="#1F2937"></app-label>
+      <app-label [text]="occupancy.occupied + ' (' + getOwnerPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
     </div>
     <div class="occupation-item">
       <div class="occupation-dot blue"></div>
-      <app-label text="Alquiladas" fontSize="14px" color="#1F2937"></app-label>
-      <app-label [text]="occupancy.rented + ' (' + getRentedPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
+      <app-label text="Inquilino" fontSize="14px" color="#1F2937"></app-label>
+      <app-label [text]="occupancy.rented + ' (' + getTenantPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
     </div>
     <div class="occupation-item">
       <div class="occupation-dot gray"></div>
-      <app-label text="Vacías" fontSize="14px" color="#1F2937"></app-label>
+      <app-label text="Vacío" fontSize="14px" color="#1F2937"></app-label>
       <app-label [text]="occupancy.empty + ' (' + getEmptyPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
     </div>
   </div>

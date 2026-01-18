@@ -31,4 +31,8 @@ export class ConsortiumServicesStatusCardComponent {
   getStatusColor(status: string): string {
     return status === 'OK' ? '#10B981' : '#F97316';
   }
+
+  toggleServiceStatus(service: ServiceStatusItem): void {
+    service.status = service.status === 'OK' ? 'WARNING' : 'OK';
+  }
 }

@@ -11,11 +11,6 @@
       "collectedAmount": 124500,
       "pendingAmount": 8000
     },
-    "reserveFund": {
-      "currentAmount": 145000,
-      "targetAmount": 200000,
-      "percentage": 72.5
-    },
     "occupancy": {
       "total": 48,
       "occupied": 45,

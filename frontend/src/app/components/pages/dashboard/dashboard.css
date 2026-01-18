@@ -10,18 +10,20 @@
   margin-bottom: 32px;
 }
 
+.dashboard-section {
+  margin-bottom: 40px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  margin-bottom: 32px;
 }
 
 .dashboard-grid-2 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  margin-bottom: 32px;
 }
 
 .card {
@@ -113,9 +115,13 @@
   .dashboard-container {
     padding: 32px 40px;
   }
+
+  .dashboard-section {
+    margin-bottom: 48px;
+  }
   
   .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 28px;
   }
   
@@ -129,8 +135,13 @@
   .dashboard-container {
     padding: 40px 48px;
   }
+
+  .dashboard-section {
+    margin-bottom: 56px;
+  }
   
   .dashboard-grid {
+    grid-template-columns: 1fr;
     gap: 32px;
   }
   
