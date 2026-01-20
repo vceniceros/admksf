@@ -26,6 +26,7 @@ CREATE TABLE unidades_funcionales(
     numero_de_unidad_funcional INTEGER,
     cuit_consorcio VARCHAR(11) NOT NULL,
     tipo_de_unidad VARCHAR(50) NOT NULL,
+    estado_de_vivienda VARCHAR(50) NOT NULL CHECK (estado_de_vivienda IN ('Propietario', 'Inquilino', 'Vacio')),
     superficie DECIMAL(7,2) NOT NULL CHECK (superficie > 0),
     dni_propietario VARCHAR(15) NOT NULL,
     FOREIGN KEY (cuit_consorcio) REFERENCES consorcios(cuit),
@@ -102,4 +103,12 @@ CREATE TABLE pagos(
     FOREIGN KEY (numero_de_unidad_funcional, cuit_consorcio) REFERENCES unidades_funcionales(numero_de_unidad_funcional, cuit_consorcio),
     FOREIGN KEY (dni_propietario) REFERENCES propietarios(dni)
 );
+
+CREATE TABLE caratula(
+    TIMESTAMP fecha_caratula PRIMARY KEY,
+    cuit_consorcio VARCHAR(11) NOT NULL,
+    texto_caratula TEXT NOT NULL,
+    FOREIGN KEY (cuit_consorcio) REFERENCES consorcios(cuit)
+);
+
 
