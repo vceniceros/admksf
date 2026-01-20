@@ -43,6 +43,6 @@
   </div>
 
   <div class="table-section">
-    <app-spending-table [spends]="spends"></app-spending-table>
+    <app-spending-table [spends]="spends" (statusChanged)="onStatusChanged($event)"></app-spending-table>
   </div>
 </div>

@@ -2,32 +2,40 @@
   <table class="spending-table">
     <thead>
       <tr>
-        <th>Fecha</th>
-        <th>Categoría</th>
+        <th>Período</th>
+        <th>Fecha Registro</th>
+        <th>Tipo Gasto</th>
         <th>Descripción</th>
-        <th>Proveedor</th>
+        <th>CUIT Proveedor</th>
         <th>Monto</th>
-        <th>Estado</th>
+        <th>Estado Pago</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let spend of spends">
         <td>
           <div class="table-date">
-            <app-icon iconHref="assets/img/sprites.svg#clock" size="16" color="#6B7280"></app-icon>
-            <span>{{ formatDate(spend.date) }}</span>
+            <app-icon iconHref="assets/img/sprites.svg#calendar" size="16" color="#6B7280"></app-icon>
+            <span>{{ formatMonth(spend.periodo) }}</span>
           </div>
         </td>
         <td>
-          <span class="category-badge">{{ spend.category }}</span>
+          <div class="table-date">
+            <app-icon iconHref="assets/img/sprites.svg#clock" size="16" color="#6B7280"></app-icon>
+            <span>{{ formatDateTime(spend.fechaRegistro) }}</span>
+          </div>
         </td>
-        <td>{{ spend.description }}</td>
-        <td>{{ spend.provider }}</td>
-        <td class="amount">{{ formatCurrency(spend.amount) }}</td>
         <td>
-          <span [class]="spend.status === 'PAID' ? 'status-badge paid' : 'status-badge pending'">
-            {{ spend.status === 'PAID' ? 'Pagado' : 'Pendiente' }}
-          </span>
+          <span class="category-badge">{{ spend.tipoGasto }}</span>
+        </td>
+        <td>{{ spend.descripcion }}</td>
+        <td class="cuit">{{ spend.cuitProveedor }}</td>
+        <td class="amount">{{ formatCurrency(spend.monto) }}</td>
+        <td>
+          <app-payment-status-toggle 
+            [spend]="spend"
+            (statusChanged)="onStatusChanged($event)">
+          </app-payment-status-toggle>
         </td>
       </tr>
     </tbody>

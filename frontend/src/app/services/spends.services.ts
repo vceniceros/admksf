@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
-import { Spend } from '../../models/spends.model';
+import { Observable, map, of, BehaviorSubject } from 'rxjs';
+import { Spend, EstadoPago } from '../../models/spends.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +9,7 @@ import { Spend } from '../../models/spends.model';
 export class SpendsService {
   private jsonUrl = 'assets/data/spendsTest.json';
   private localSpends: Spend[] = [];
+  private spendsSubject = new BehaviorSubject<Spend[]>([]);
 
   constructor(private http: HttpClient) { }
 
@@ -26,7 +27,7 @@ export class SpendsService {
 
   getSpendById(id: number): Observable<Spend | undefined> {
     return this.getAllSpends().pipe(
-      map(spends => spends.find(s => s.id === id))
+      map(spends => spends.find(s => s.idGasto === id))
     );
   }
 
@@ -36,4 +37,23 @@ export class SpendsService {
     this.localSpends = [...this.localSpends, spend];
     return of(spend);
   }
+
+  updateSpendStatus(spend: Spend, newStatus: EstadoPago): Observable<Spend> {
+    // Actualiza el estado del gasto
+    // API: POST /api/gastos/{idGasto}/status
+    // Por ahora solo actualiza en memoria
+    const updatedSpend = { ...spend, estadoPago: newStatus };
+    
+    // Actualizar en localSpends si existe
+    const localIndex = this.localSpends.findIndex(s => s.idGasto === spend.idGasto);
+    if (localIndex !== -1) {
+      this.localSpends[localIndex] = updatedSpend;
+    }
+    
+    // TODO: Reemplazar con llamada real al backend
+    // return this.http.post<Spend>(`/api/gastos/${spend.idGasto}/status`, { estadoPago: newStatus });
+    
+    return of(updatedSpend);
+  }
 }
+

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SpendsService } from '../../../services/spends.services';
-import { SpendStatus } from '../../../../models/spends.model';
+import { EstadoPago } from '../../../../models/spends.model';
 import { DropZone } from '../../molecules/drop-zone/drop-zone';
 import { FilePreview } from '../../molecules/file-preview/file-preview';
 import { ExpenseForm } from '../../organism/expense-form/expense-form';
@@ -36,12 +36,13 @@ export class ExpenseUpload implements OnInit {
     private route: ActivatedRoute
   ) {
     this.expenseForm = this.fb.group({
-      date: ['', Validators.required],
-      category: ['', Validators.required],
-      description: ['', Validators.required],
-      provider: ['', Validators.required],
-      amount: [0, [Validators.required, Validators.min(0.01)]],
-      status: [SpendStatus.PENDING, Validators.required]
+      cuitConsorcio: ['', Validators.required],
+      cuitProveedor: ['', Validators.required],
+      periodo: ['', Validators.required],
+      tipoGasto: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      monto: [0, [Validators.required, Validators.min(0.01)]],
+      estadoPago: [EstadoPago.PENDIENTE, Validators.required]
     });
   }
 
@@ -67,13 +68,15 @@ export class ExpenseUpload implements OnInit {
     if (this.expenseForm.valid) {
       const formValue = this.expenseForm.value;
       const newSpend = {
-        id: Date.now(), // ID temporal
-        date: formValue.date,
-        category: formValue.category,
-        description: formValue.description,
-        provider: formValue.provider,
-        amount: formValue.amount,
-        status: formValue.status
+        idGasto: Date.now(),
+        cuitConsorcio: formValue.cuitConsorcio,
+        cuitProveedor: formValue.cuitProveedor,
+        periodo: formValue.periodo,
+        descripcion: formValue.descripcion,
+        monto: formValue.monto,
+        fechaRegistro: new Date().toISOString(),
+        tipoGasto: formValue.tipoGasto,
+        estadoPago: formValue.estadoPago
       };
 
       this.spendsService.addSpend(newSpend).subscribe({

@@ -1,85 +1,103 @@
 <div class="expense-form">
   <form [formGroup]="form">
-    <div class="form-group">
-      <label class="form-label">Fecha</label>
-      <input 
-        type="date" 
-        formControlName="date" 
-        class="form-input"
-        [class.invalid]="date?.invalid && date?.touched">
-      <div *ngIf="date?.invalid && date?.touched" class="error-message">
-        La fecha es requerida
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">CUIT Consorcio</label>
+        <input 
+          type="text" 
+          formControlName="cuitConsorcio" 
+          class="form-input"
+          placeholder="30123456789"
+          [class.invalid]="cuitConsorcio?.invalid && cuitConsorcio?.touched">
+        <div *ngIf="cuitConsorcio?.invalid && cuitConsorcio?.touched" class="error-message">
+          El CUIT del consorcio es requerido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CUIT Proveedor</label>
+        <input 
+          type="text" 
+          formControlName="cuitProveedor" 
+          class="form-input"
+          placeholder="30987654321"
+          [class.invalid]="cuitProveedor?.invalid && cuitProveedor?.touched">
+        <div *ngIf="cuitProveedor?.invalid && cuitProveedor?.touched" class="error-message">
+          El CUIT del proveedor es requerido
+        </div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Categoría</label>
-      <select 
-        formControlName="category" 
-        class="form-input"
-        [class.invalid]="category?.invalid && category?.touched">
-        <option value="">Seleccionar categoría</option>
-        <option value="Mantenimiento">Mantenimiento</option>
-        <option value="Servicios">Servicios</option>
-        <option value="Limpieza">Limpieza</option>
-        <option value="Administración">Administración</option>
-        <option value="Seguridad">Seguridad</option>
-      </select>
-      <div *ngIf="category?.invalid && category?.touched" class="error-message">
-        La categoría es requerida
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Período</label>
+        <input 
+          type="date" 
+          formControlName="periodo" 
+          class="form-input"
+          [class.invalid]="periodo?.invalid && periodo?.touched">
+        <div *ngIf="periodo?.invalid && periodo?.touched" class="error-message">
+          El período es requerido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tipo de Gasto</label>
+        <select 
+          formControlName="tipoGasto" 
+          class="form-input"
+          [class.invalid]="tipoGasto?.invalid && tipoGasto?.touched">
+          <option value="">Seleccionar tipo</option>
+          <option *ngFor="let tipo of tipoGastoOptions" [value]="tipo">
+            {{ tipo }}
+          </option>
+        </select>
+        <div *ngIf="tipoGasto?.invalid && tipoGasto?.touched" class="error-message">
+          El tipo de gasto es requerido
+        </div>
       </div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Descripción</label>
       <textarea 
-        formControlName="description" 
+        formControlName="descripcion" 
         class="form-input"
         rows="3"
-        [class.invalid]="description?.invalid && description?.touched"></textarea>
-      <div *ngIf="description?.invalid && description?.touched" class="error-message">
+        [class.invalid]="descripcion?.invalid && descripcion?.touched"></textarea>
+      <div *ngIf="descripcion?.invalid && descripcion?.touched" class="error-message">
         La descripción es requerida
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Proveedor</label>
-      <input 
-        type="text" 
-        formControlName="provider" 
-        class="form-input"
-        [class.invalid]="provider?.invalid && provider?.touched">
-      <div *ngIf="provider?.invalid && provider?.touched" class="error-message">
-        El proveedor es requerido
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Monto</label>
+        <label class="form-label">Monto ($)</label>
         <input 
           type="number" 
-          formControlName="amount" 
+          formControlName="monto" 
           class="form-input"
-          min="0"
+          min="0.01"
           step="0.01"
-          [class.invalid]="amount?.invalid && amount?.touched">
-        <div *ngIf="amount?.invalid && amount?.touched" class="error-message">
+          [class.invalid]="monto?.invalid && monto?.touched">
+        <div *ngIf="monto?.invalid && monto?.touched" class="error-message">
           El monto es requerido y debe ser mayor a 0
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Estado</label>
+        <label class="form-label">Estado Pago</label>
         <select 
-          formControlName="status" 
+          formControlName="estadoPago" 
           class="form-input"
-          [class.invalid]="status?.invalid && status?.touched">
-          <option [value]="SpendStatus.PAID">Pagado</option>
-          <option [value]="SpendStatus.PENDING">Pendiente</option>
+          [class.invalid]="estadoPago?.invalid && estadoPago?.touched">
+          <option value="">Seleccionar estado</option>
+          <option *ngFor="let estado of estadoPagoOptions" [value]="estado">
+            {{ estado }}
+          </option>
         </select>
-        <div *ngIf="status?.invalid && status?.touched" class="error-message">
-          El estado es requerido
+        <div *ngIf="estadoPago?.invalid && estadoPago?.touched" class="error-message">
+          El estado de pago es requerido
         </div>
       </div>
     </div>
