@@ -1,0 +1,7 @@
+@startuml
+title Diagrama de Arquitectura
+[Frontend: Angular.js] --> [Backend: Django] 
+[Backend: Django] --> [API RESTFULL: n8n]
+[Backend: Django] --> [DRIVE: Google Drive]
+[Backend: Django] --> [Base de Datos: PostgreSQL]
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title Diagrama de Procesos
+
+Actor karina 
+participant "frontend" as frontend
+participant "entryPoint" as entryPoint
+participant "backend" as backend
+participant "n8n" as n8n
+participant "base de datos" as bd
+
+
+
+karina  ---> frontend :cargarFactura(facturaFisica)
+frontend -> entryPoint : recibirFactura(facturaFisica):Request
+entryPoint -> backend : enviarFactura(facturaFisica):Request
+backend -> n8n : procesarFactura(facturaFisica):Request
+n8n -> n8n : extraerDatos(facturaFisica):json
+n8n -> backend : enviarDatosFactura(json):Response
+backend -> bd : guardarDatosFactura(json):void
+
+
+
+karina --> frontend : consultarFactura(id):Request
+frontend -> entryPoint : solicitarFactura(id):Request
+entryPoint -> backend : obtenerFactura(id):Request
+backend -> bd : buscarFactura(id):json
+bd --> backend : devolverDatosFactura(json):Response
+backend -> backend : crearFacturaDigital(json):FacturaDigital
+backend --> entryPoint : enviarFacturaDigital(FacturaDigital):Response(json)
+entryPoint --> frontend : entregarFacturaDigital(FacturaDigital):Response
+frontend --> karina : mostrarFactura(FacturaDigital):FacturaDigital
+
+
+@enduml
