@@ -1,0 +1,67 @@
+<div class="dashboard-container" *ngIf="consortium && dashboardSummary">
+  <div class="dashboard-header">
+    <div>
+      <app-label [text]="consortium.name" fontSize="24px" color="#1F2937" style="font-weight: 700;"></app-label>
+      <app-label text="Dashboard - Resumen general del consorcio" fontSize="14px" color="#6B7280"></app-label>
+    </div>
+  </div>
+
+  <!-- Cards principales -->
+  <app-consortium-dashboard-cards [dashboardSummary]="dashboardSummary" [consortium]="consortium"></app-consortium-dashboard-cards>
+
+  <!-- Tasa de Cobro -->
+  <div class="dashboard-section">
+    <app-consortium-collection-rates-card [collection]="dashboardSummary.collection"></app-consortium-collection-rates-card>
+  </div>
+
+  <!-- Carátula de Eventos -->
+  <div class="dashboard-section">
+    <app-consortium-events-card [events]="events"></app-consortium-events-card>
+  </div>
+
+  <!-- Sección superior: Ocupación y Notificaciones -->
+  <div class="dashboard-section">
+    <div class="dashboard-grid-2">
+      <!-- Estado de Ocupación -->
+      <app-consortium-ocupation-rate-card [occupancy]="dashboardSummary.occupancy"></app-consortium-ocupation-rate-card>
+
+      <!-- Notificaciones -->
+      <div class="card notifications-card" *ngIf="notifications.length > 0">
+        <div class="card-header">
+          <div class="header-left">
+            <app-icon iconHref="assets/img/sprites.svg#bell" size="20" color="#F97316"></app-icon>
+            <app-label text="Notificaciones y Alertas" fontSize="18px" color="#1F2937" style="font-weight: 600;"></app-label>
+          </div>
+        </div>
+        <div class="notifications-list">
+          <div class="notification-item" *ngFor="let notification of notifications">
+            <div class="notification-icon" [ngClass]="'notification-' + notification.type.toLowerCase()">
+              <app-icon 
+                [iconHref]="notification.type === 'WARNING' ? 'assets/img/sprites.svg#exclamation' : notification.type === 'ERROR' ? 'assets/img/sprites.svg#x' : 'assets/img/sprites.svg#bell'"
+                size="16" 
+                [color]="notification.type === 'WARNING' ? '#FFFFFF' : notification.type === 'ERROR' ? '#FFFFFF' : '#FFFFFF'">
+              </app-icon>
+            </div>
+            <div class="notification-content">
+              <app-label [text]="notification.message" fontSize="14px" color="#1F2937"></app-label>
+              <app-label [text]="notification.timestamp" fontSize="12px" color="#9CA3AF"></app-label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de servicios (ancho completo) -->
+  <div class="dashboard-section">
+    <div class="dashboard-grid">
+      <!-- Estado de Servicios -->
+      <app-consortium-services-status-card [services]="servicesStatus"></app-consortium-services-status-card>
+    </div>
+  </div>
+
+  <!-- Pagos Recientes -->
+  <div class="dashboard-section">
+    <app-consortium-last-payment-card-found-card [payments]="lastPayments"></app-consortium-last-payment-card-found-card>
+  </div>
+</div>

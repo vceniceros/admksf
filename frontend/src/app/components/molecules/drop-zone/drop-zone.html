@@ -1,0 +1,19 @@
+<div 
+  class="drop-zone" 
+  [class.dragging]="isDragging"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+  (click)="fileInput.click()">
+  <input 
+    #fileInput 
+    type="file" 
+    accept="image/jpeg,image/jpg,application/pdf,.jpg,.jpeg,.pdf" 
+    style="display: none"
+    (change)="onFileSelected($event)">
+  <div class="drop-zone-content">
+    <app-icon iconHref="assets/img/sprites.svg#cloud-upload" size="48" color="#2563EB"></app-icon>
+    <app-label text="Arrastra un archivo aquí o haz clic para seleccionar" fontSize="16px" color="#6B7280"></app-label>
+    <app-label text="Formatos: JPG, PDF" fontSize="14px" color="#9CA3AF"></app-label>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="expense-upload-page">
+  <div class="page-header">
+    <div>
+      <app-label text="Cargar Nuevo Gasto" fontSize="32px" color="#1F2937"></app-label>
+      <app-label text="Sube una imagen del recibo y completa la información" fontSize="16px" color="#6B7280"></app-label>
+    </div>
+  </div>
+
+  <div class="upload-container">
+    <div class="upload-section">
+      <app-label text="Subir Recibo (Opcional)" fontSize="20px" color="#1F2937"></app-label>
+      <div *ngIf="!selectedFile">
+        <app-drop-zone (fileDropped)="onFileDropped($event)"></app-drop-zone>
+      </div>
+      <div *ngIf="selectedFile">
+        <app-file-preview [fileName]="fileName" (remove)="onFileRemove()"></app-file-preview>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <app-label text="Información del Gasto" fontSize="20px" color="#1F2937"></app-label>
+      <app-expense-form [form]="expenseForm"></app-expense-form>
+      
+      <div class="form-actions">
+        <button class="cancel-button" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button class="submit-button" (click)="onSubmit()" [disabled]="expenseForm.invalid">
+          Guardar Gasto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

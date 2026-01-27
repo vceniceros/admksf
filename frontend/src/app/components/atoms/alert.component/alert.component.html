@@ -1,0 +1,17 @@
+<div class="alert-overlay" *ngIf="isOpen" (click)="onCancel()">
+  <div class="alert-modal" [ngClass]="getAlertClass()" (click)="$event.stopPropagation()">
+    <div class="alert-header">
+      <h2 class="alert-title">{{ title }}</h2>
+      <button class="alert-close" (click)="onCancel()">×</button>
+    </div>
+    
+    <div class="alert-body">
+      <p class="alert-message">{{ message }}</p>
+    </div>
+    
+    <div class="alert-footer">
+      <button class="btn btn-secondary" (click)="onCancel()">{{ cancelText }}</button>
+      <button class="btn btn-primary" (click)="onConfirm()">{{ confirmText }}</button>
+    </div>
+  </div>
+</div>

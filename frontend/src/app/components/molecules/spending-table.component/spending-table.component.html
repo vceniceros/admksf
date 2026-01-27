@@ -1,0 +1,43 @@
+<div class="spending-table-container">
+  <table class="spending-table">
+    <thead>
+      <tr>
+        <th>Período</th>
+        <th>Fecha Registro</th>
+        <th>Tipo Gasto</th>
+        <th>Descripción</th>
+        <th>CUIT Proveedor</th>
+        <th>Monto</th>
+        <th>Estado Pago</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let spend of spends">
+        <td>
+          <div class="table-date">
+            <app-icon iconHref="assets/img/sprites.svg#calendar" size="16" color="#6B7280"></app-icon>
+            <span>{{ formatMonth(spend.periodo) }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="table-date">
+            <app-icon iconHref="assets/img/sprites.svg#clock" size="16" color="#6B7280"></app-icon>
+            <span>{{ formatDateTime(spend.fechaRegistro) }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="category-badge">{{ spend.tipoGasto }}</span>
+        </td>
+        <td>{{ spend.descripcion }}</td>
+        <td class="cuit">{{ spend.cuitProveedor }}</td>
+        <td class="amount">{{ formatCurrency(spend.monto) }}</td>
+        <td>
+          <app-payment-status-toggle 
+            [spend]="spend"
+            (statusChanged)="onStatusChanged($event)">
+          </app-payment-status-toggle>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

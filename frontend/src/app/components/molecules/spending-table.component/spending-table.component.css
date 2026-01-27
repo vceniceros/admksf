@@ -1,0 +1,101 @@
+.spending-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.spending-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: serif;
+}
+
+.spending-table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.spending-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  font-family: serif;
+}
+
+.spending-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.spending-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.spending-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.spending-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1f2937;
+  font-family: serif;
+}
+
+.table-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.amount {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.paid {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.status-badge.pending {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .spending-table {
+    font-size: 12px;
+  }
+
+  .spending-table th,
+  .spending-table td {
+    padding: 8px 12px;
+  }
+}

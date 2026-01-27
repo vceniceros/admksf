@@ -1,0 +1,30 @@
+[
+    {
+      "id": "water",
+      "name": "Agua",
+      "company": "AySA",
+      "phoneNumber": "+54 11 4740-5000",
+      "status": "OK"
+    },
+    {
+      "id": "electricity",
+      "name": "Electricidad",
+      "company": "Edenor",
+      "phoneNumber": "+54 11 4747-1111",
+      "status": "OK"
+    },
+    {
+      "id": "internet",
+      "name": "Internet",
+      "company": "Flow",
+      "phoneNumber": "+54 11 4341-7777",
+      "status": "OK"
+    },
+    {
+      "id": "elevator",
+      "name": "Ascensores",
+      "company": "Asensores SA",
+      "phoneNumber": "+54 11 5555-1234",
+      "status": "WARNING"
+    }
+]
