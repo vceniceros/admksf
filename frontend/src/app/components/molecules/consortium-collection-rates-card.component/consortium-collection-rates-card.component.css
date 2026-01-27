@@ -1,0 +1,19 @@
+.collection-card {
+  margin-bottom: 32px;
+}
+
+.collection-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  gap: 24px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}

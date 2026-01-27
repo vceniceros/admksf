@@ -1,0 +1,105 @@
+.expenses-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.page-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.new-expense-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: #2563EB;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: serif;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.new-expense-btn:hover {
+  background-color: #1D4ED8;
+}
+
+.balance-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.balance-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-icon.blue {
+  background-color: #DBEAFE;
+}
+
+.card-icon.green {
+  background-color: #D1FAE5;
+}
+
+.card-icon.orange {
+  background-color: #FEF3C7;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.table-section {
+  width: 100%;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .balance-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .expenses-page {
+    padding: 32px;
+  }
+}

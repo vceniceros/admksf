@@ -1,0 +1,48 @@
+<div class="expenses-page">
+  <div class="page-header">
+    <div>
+      <app-label text="Gastos Comunes" fontSize="32px" color="#1F2937"></app-label>
+      <app-label text="Registro de gastos del consorcio" fontSize="16px" color="#6B7280"></app-label>
+    </div>
+    <button class="new-expense-btn" [routerLink]="['/dashboard', consortiumName, 'gastos', 'carga-de-gasto']">
+      <app-icon iconHref="assets/img/sprites.svg#plus" size="16" color="#FFFFFF"></app-icon>
+      <span>Nuevo Gasto</span>
+    </button>
+  </div>
+
+  <div class="balance-cards">
+    <div class="balance-card total">
+      <div class="card-icon blue">
+        <app-icon iconHref="assets/img/sprites.svg#dollar" size="24" color="#2563EB"></app-icon>
+      </div>
+      <div class="card-content">
+        <app-label text="Total Gastos" fontSize="14px" color="#6B7280"></app-label>
+        <app-label [text]="formatCurrency(totalSpends)" fontSize="24px" color="#1F2937"></app-label>
+      </div>
+    </div>
+
+    <div class="balance-card paid">
+      <div class="card-icon green">
+        <app-icon iconHref="assets/img/sprites.svg#dollar" size="24" color="#10B981"></app-icon>
+      </div>
+      <div class="card-content">
+        <app-label text="Pagados" fontSize="14px" color="#6B7280"></app-label>
+        <app-label [text]="formatCurrency(paidSpends)" fontSize="24px" color="#1F2937"></app-label>
+      </div>
+    </div>
+
+    <div class="balance-card pending">
+      <div class="card-icon orange">
+        <app-icon iconHref="assets/img/sprites.svg#dollar" size="24" color="#F59E0B"></app-icon>
+      </div>
+      <div class="card-content">
+        <app-label text="Pendientes" fontSize="14px" color="#6B7280"></app-label>
+        <app-label [text]="formatCurrency(pendingSpends)" fontSize="24px" color="#1F2937"></app-label>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <app-spending-table [spends]="spends" (statusChanged)="onStatusChanged($event)"></app-spending-table>
+  </div>
+</div>

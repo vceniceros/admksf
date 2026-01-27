@@ -1,0 +1,53 @@
+.payment-status-toggle {
+  display: inline-block;
+}
+
+.status-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.status-button:hover {
+  transform: scale(1.05);
+  filter: brightness(0.95);
+}
+
+.status-button:active {
+  transform: scale(0.98);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: all 0.2s;
+}
+
+.status-button.paid .status-badge {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.status-button.paid:hover .status-badge {
+  background-color: #a7f3d0;
+  border-color: #34d399;
+}
+
+.status-button.pending .status-badge {
+  background-color: #fed7aa;
+  color: #92400e;
+  border: 1px solid #fdba74;
+}
+
+.status-button.pending:hover .status-badge {
+  background-color: #fecdd3;
+  border-color: #fca5a5;
+}

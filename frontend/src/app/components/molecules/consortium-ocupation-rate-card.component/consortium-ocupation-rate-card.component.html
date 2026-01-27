@@ -1,0 +1,25 @@
+<div class="card occupation-card">
+  <div class="card-header">
+    <div class="header-left">
+      <app-icon iconHref="assets/img/sprites.svg#home" size="20" color="#9333EA"></app-icon>
+      <app-label text="Estado de Ocupación" fontSize="18px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+  </div>
+  <div class="occupation-list">
+    <div class="occupation-item">
+      <div class="occupation-dot green"></div>
+      <app-label text="Propietario" fontSize="14px" color="#1F2937"></app-label>
+      <app-label [text]="occupancy.occupied + ' (' + getOwnerPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+    <div class="occupation-item">
+      <div class="occupation-dot blue"></div>
+      <app-label text="Inquilino" fontSize="14px" color="#1F2937"></app-label>
+      <app-label [text]="occupancy.rented + ' (' + getTenantPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+    <div class="occupation-item">
+      <div class="occupation-dot gray"></div>
+      <app-label text="Vacío" fontSize="14px" color="#1F2937"></app-label>
+      <app-label [text]="occupancy.empty + ' (' + getEmptyPercentage() + '%)'" fontSize="14px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+  </div>
+</div>

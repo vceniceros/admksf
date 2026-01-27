@@ -1,0 +1,39 @@
+<div class="dashboard-cards-grid">
+  <div class="dashboard-card">
+    <div class="card-header-row">
+      <app-icon iconHref="assets/img/sprites.svg#building" size="24" color="#2563EB"></app-icon>
+      <span class="trend-indicator positive">+2</span>
+    </div>
+    <app-label text="Total Unidades" fontSize="14px" color="#6B7280"></app-label>
+    <app-label [text]="dashboardSummary.occupancy.total.toString()" fontSize="32px" color="#1F2937" style="font-weight: 700;"></app-label>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="card-header-row">
+      <app-icon iconHref="assets/img/sprites.svg#people" size="24" color="#2563EB"></app-icon>
+      <span class="trend-indicator positive">+3</span>
+    </div>
+    <app-label text="Propietarios" fontSize="14px" color="#6B7280"></app-label>
+    <app-label [text]="consortium.owners.toString()" fontSize="32px" color="#1F2937" style="font-weight: 700;"></app-label>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="card-header-row">
+      <app-icon iconHref="assets/img/sprites.svg#trending-up" size="24" color="#2563EB"></app-icon>
+      <span class="trend-indicator positive">+12%</span>
+    </div>
+    <app-label text="Ingresos del Mes" fontSize="14px" color="#6B7280"></app-label>
+    <app-label [text]="'$' + dashboardSummary.financials.monthlyIncome.toLocaleString()" fontSize="32px" color="#1F2937" style="font-weight: 700;"></app-label>
+  </div>
+
+  <div class="dashboard-card">
+    <div class="card-header-row">
+      <app-icon iconHref="assets/img/sprites.svg#trending-down" size="24" color="#2563EB"></app-icon>
+      <span class="trend-indicator" [ngClass]="dashboardSummary.financials.expenseTrend < 0 ? 'positive' : 'negative'">
+        {{dashboardSummary.financials.expenseTrend > 0 ? '+' : ''}}{{dashboardSummary.financials.expenseTrend}}%
+      </span>
+    </div>
+    <app-label text="Gastos del Mes" fontSize="14px" color="#6B7280"></app-label>
+    <app-label [text]="'$' + dashboardSummary.financials.monthlyExpenses.toLocaleString()" fontSize="32px" color="#1F2937" style="font-weight: 700;"></app-label>
+  </div>
+</div>

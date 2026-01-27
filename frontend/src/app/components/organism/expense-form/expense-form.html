@@ -1,0 +1,105 @@
+<div class="expense-form">
+  <form [formGroup]="form">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">CUIT Consorcio</label>
+        <input 
+          type="text" 
+          formControlName="cuitConsorcio" 
+          class="form-input"
+          placeholder="30123456789"
+          [class.invalid]="cuitConsorcio?.invalid && cuitConsorcio?.touched">
+        <div *ngIf="cuitConsorcio?.invalid && cuitConsorcio?.touched" class="error-message">
+          El CUIT del consorcio es requerido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CUIT Proveedor</label>
+        <input 
+          type="text" 
+          formControlName="cuitProveedor" 
+          class="form-input"
+          placeholder="30987654321"
+          [class.invalid]="cuitProveedor?.invalid && cuitProveedor?.touched">
+        <div *ngIf="cuitProveedor?.invalid && cuitProveedor?.touched" class="error-message">
+          El CUIT del proveedor es requerido
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Período</label>
+        <input 
+          type="date" 
+          formControlName="periodo" 
+          class="form-input"
+          [class.invalid]="periodo?.invalid && periodo?.touched">
+        <div *ngIf="periodo?.invalid && periodo?.touched" class="error-message">
+          El período es requerido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tipo de Gasto</label>
+        <select 
+          formControlName="tipoGasto" 
+          class="form-input"
+          [class.invalid]="tipoGasto?.invalid && tipoGasto?.touched">
+          <option value="">Seleccionar tipo</option>
+          <option *ngFor="let tipo of tipoGastoOptions" [value]="tipo">
+            {{ tipo }}
+          </option>
+        </select>
+        <div *ngIf="tipoGasto?.invalid && tipoGasto?.touched" class="error-message">
+          El tipo de gasto es requerido
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <textarea 
+        formControlName="descripcion" 
+        class="form-input"
+        rows="3"
+        [class.invalid]="descripcion?.invalid && descripcion?.touched"></textarea>
+      <div *ngIf="descripcion?.invalid && descripcion?.touched" class="error-message">
+        La descripción es requerida
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Monto ($)</label>
+        <input 
+          type="number" 
+          formControlName="monto" 
+          class="form-input"
+          min="0.01"
+          step="0.01"
+          [class.invalid]="monto?.invalid && monto?.touched">
+        <div *ngIf="monto?.invalid && monto?.touched" class="error-message">
+          El monto es requerido y debe ser mayor a 0
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Estado Pago</label>
+        <select 
+          formControlName="estadoPago" 
+          class="form-input"
+          [class.invalid]="estadoPago?.invalid && estadoPago?.touched">
+          <option value="">Seleccionar estado</option>
+          <option *ngFor="let estado of estadoPagoOptions" [value]="estado">
+            {{ estado }}
+          </option>
+        </select>
+        <div *ngIf="estadoPago?.invalid && estadoPago?.touched" class="error-message">
+          El estado de pago es requerido
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,22 @@
+<div class="card payments-card">
+  <div class="card-header">
+    <div class="header-left">
+      <app-icon iconHref="assets/img/sprites.svg#people" size="20" color="#10B981"></app-icon>
+      <app-label text="Pagos Recientes" fontSize="18px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+  </div>
+  <div class="payments-list">
+    <div class="payment-item" *ngFor="let payment of payments">
+      <div class="payment-info">
+        <app-label [text]="payment.personName" fontSize="14px" color="#1F2937" style="font-weight: 500;"></app-label>
+        <app-label [text]="payment.unit" fontSize="12px" color="#9CA3AF"></app-label>
+      </div>
+      <div class="payment-amount">
+        <app-label [text]="'$' + payment.amount.toLocaleString()" fontSize="14px" [color]="payment.status === 'PAID' ? '#10B981' : '#1F2937'" style="font-weight: 600;"></app-label>
+        <span class="status-badge" [ngClass]="payment.status === 'PAID' ? 'paid' : 'pending'">
+          {{payment.status === 'PAID' ? 'Pagado' : 'Pendiente'}}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

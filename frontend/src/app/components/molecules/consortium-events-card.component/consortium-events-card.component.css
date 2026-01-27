@@ -1,0 +1,163 @@
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-event-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-event-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.event-form {
+  background-color: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1f2937;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-cancel {
+  background-color: #ffffff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-cancel:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-save {
+  background-color: #8B5CF6;
+  color: #ffffff;
+}
+
+.btn-save:hover:not(:disabled) {
+  background-color: #7c3aed;
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.event-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.event-row:hover {
+  background-color: #f9fafb;
+  margin: 0 -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+  border-radius: 8px;
+}
+
+.event-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.event-date {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.event-description {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .event-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .event-date {
+    padding-bottom: 4px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+  }
+}

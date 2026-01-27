@@ -1,0 +1,30 @@
+[
+    {
+      "id": 1,
+      "personName": "Juan Pérez",
+      "unit": "Dpto 3A",
+      "amount": 2800,
+      "status": "PAID"
+    },
+    {
+      "id": 2,
+      "personName": "María García",
+      "unit": "Dpto 5B",
+      "amount": 2600,
+      "status": "PAID"
+    },
+    {
+      "id": 3,
+      "personName": "Carlos López",
+      "unit": "Dpto 1C",
+      "amount": 3200,
+      "status": "PAID"
+    },
+    {
+      "id": 4,
+      "personName": "Ana Martínez",
+      "unit": "Dpto 7A",
+      "amount": 2900,
+      "status": "PENDING"
+    }
+  ]

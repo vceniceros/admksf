@@ -1,0 +1,10 @@
+<header class="navbar flex justify-between items-center px-6 py-4 bg-white border-b border-gray-200">
+  <div class="flex items-center gap-4">
+    <img src="assets/img/logo-prueba.svg" alt="ConsorcioAdmin" class="navbar-logo">
+  </div>
+<button 
+  *ngIf="showMenuButton"
+  class="block md:hidden bg-gray-200 px-4 py-2 rounded hover:bg-gray-400 text-gray-600"
+  (click)="onMenuClick()"> <app-icon iconHref="assets/img/sprites.svg#menu" size="24" color="#000000"></app-icon>
+  </button>
+</header>

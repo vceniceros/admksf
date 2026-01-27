@@ -1,0 +1,20 @@
+<div class="card services-card">
+  <div class="card-header">
+    <div class="header-left">
+      <app-icon iconHref="assets/img/sprites.svg#shield" size="20" color="#2563EB"></app-icon>
+      <app-label text="Estado de Servicios" fontSize="18px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+  </div>
+  <div class="services-list">
+    <div class="service-item" *ngFor="let service of services">
+      <app-icon [iconHref]="getServiceIcon(service.id)" size="24" color="#9CA3AF"></app-icon>
+      <div class="service-info">
+        <app-label [text]="service.name" fontSize="14px" color="#374151"></app-label>
+        <app-label [text]="service.company + ' - ' + service.phoneNumber" fontSize="12px" color="#6B7280"></app-label>
+      </div>
+      <div class="status-indicator" [style.background-color]="getStatusColor(service.status)" (click)="toggleServiceStatus(service)">
+        <app-icon [iconHref]="getStatusIcon(service.status)" size="12" color="#FFFFFF"></app-icon>
+      </div>
+    </div>
+  </div>
+</div>

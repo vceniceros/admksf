@@ -1,0 +1,92 @@
+.expense-upload-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.upload-section {
+  margin-bottom: 16px;
+}
+
+.upload-section,
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.cancel-button {
+  background-color: #F3F4F6;
+  color: #374151;
+}
+
+.cancel-button:hover {
+  background-color: #E5E7EB;
+}
+
+.submit-button {
+  background-color: #2563EB;
+  color: #FFFFFF;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #1D4ED8;
+}
+
+.submit-button:disabled {
+  background-color: #9CA3AF;
+  cursor: not-allowed;
+}
+
+@media (min-width: 768px) {
+  .upload-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .upload-section {
+    flex: 1;
+  }
+
+  .form-section {
+    flex: 1;
+  }
+}
