@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Consortium } from '../../../../models/consortium.model';
@@ -25,6 +25,7 @@ import { IconComponent } from '../../atoms/icon.component/icon.component';
 })
 export class ConsortiumCardComponent {
   @Input() consortium!: Consortium;
+  @Output() deleteConsortium = new EventEmitter<Consortium>();
 
   constructor(private router: Router) {}
 
@@ -33,5 +34,15 @@ export class ConsortiumCardComponent {
       const nameForUrl = this.consortium.name.toLowerCase().replace(/\s+/g, '-');
       this.router.navigate(['/dashboard', nameForUrl]);
     }
+  }
+
+  onDeleteClick(event: Event) {
+    event.stopPropagation();
+    this.deleteConsortium.emit(this.consortium);
+  }
+
+  onEditClick(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/consorcios', this.consortium.id, 'editar']);
   }
 }

@@ -10,7 +10,8 @@ CREATE TABLE consorcios(
     codigo_postal VARCHAR(10) NOT NULL,
     ciudad VARCHAR(50) NOT NULL,
     interes_por_mora DECIMAL(5,2) NOT NULL CHECK (interes_por_mora >= 0),
-    redondeo_aumento DECIMAL(5,2) NOT NULL CHECK (redondeo_aumento >= 0)
+    redondeo_aumento DECIMAL(5,2) NOT NULL CHECK (redondeo_aumento >= 0),
+    imagen_url VARCHAR(255)
 );
 
 CREATE TABLE propietarios(
@@ -25,7 +26,7 @@ CREATE TABLE propietarios(
 CREATE TABLE unidades_funcionales(
     numero_de_unidad_funcional INTEGER,
     cuit_consorcio VARCHAR(11) NOT NULL,
-    tipo_de_unidad VARCHAR(50) NOT NULL,
+    tipo_de_unidad VARCHAR(50) NOT NULL CHECK (tipo_de_unidad IN ('Departamento', 'Lote')),
     estado_de_vivienda VARCHAR(50) NOT NULL CHECK (estado_de_vivienda IN ('Propietario', 'Inquilino', 'Vacio')),
     superficie DECIMAL(7,2) NOT NULL CHECK (superficie > 0),
     dni_propietario VARCHAR(15) NOT NULL,
@@ -98,6 +99,7 @@ CREATE TABLE pagos(
     cuit_consorcio VARCHAR(11) NOT NULL,
     dni_propietario VARCHAR(15) NOT NULL,
     monto DECIMAL(10,2) NOT NULL CHECK (monto > 0),
+    estado_pago VARCHAR(20) NOT NULL CHECK (estado_pago IN ('Aprobado', 'Pendiente', 'Parcial')) DEFAULT 'Pendiente',
     fecha_pago TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id_pago, numero_de_unidad_funcional, cuit_consorcio),
     FOREIGN KEY (numero_de_unidad_funcional, cuit_consorcio) REFERENCES unidades_funcionales(numero_de_unidad_funcional, cuit_consorcio),

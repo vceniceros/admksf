@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DashboardService } from '../../../services/dashboard.service';
 import { ServicesService } from '../../../services/services.service';
 import { PaymentService } from '../../../services/payment.services';
 import { NotificationsService } from '../../../services/notifications.service';
 import { ConsortiumService } from '../../../services/consortium.service';
-import { EventsService } from '../../../services/events.service';
 import { DashboardSummary } from '../../../../models/dashboardSummary.model';
 import { ServiceStatusItem } from '../../../../models/services.model';
 import { Payment } from '../../../../models/payment.model';
@@ -53,12 +53,12 @@ export class Dashboard implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private http: HttpClient,
     private dashboardService: DashboardService,
     private servicesService: ServicesService,
     private paymentService: PaymentService,
     private notificationsService: NotificationsService,
-    private consortiumService: ConsortiumService,
-    private eventsService: EventsService
+    private consortiumService: ConsortiumService
   ) {}
 
   ngOnInit() {
@@ -133,8 +133,29 @@ export class Dashboard implements OnInit {
     });
 
     // Cargar eventos
-    this.eventsService.getEvents(this.consortiumId).subscribe({
-      next: (data) => this.events = data
+    this.http.get<{ status: string; data: any[] }>(`/api/caratula/consorcio/${this.consortiumId}/`).subscribe({
+      next: (response) => {
+        const data = response?.data || [];
+        this.events = data.map((item, index) => ({
+          id: index + 1,
+          date: this.formatDate(item.fecha),
+          description: item.texto ?? item.texto_preview ?? ''
+        }));
+      }
     });
+  }
+
+  private formatDate(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 }

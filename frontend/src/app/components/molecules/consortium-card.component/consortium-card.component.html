@@ -3,7 +3,15 @@
   <div class="card-content">
     <div class="card-header">
       <app-label [text]="consortium.name" fontSize="18px" color="#1F2937"></app-label>
-      <app-status-label [status]="consortium.status"></app-status-label>
+      <div class="card-actions">
+        <app-status-label [status]="consortium.status"></app-status-label>
+        <button class="icon-button" title="Editar consorcio" (click)="onEditClick($event)">
+          <app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+        </button>
+        <button class="icon-button danger" title="Eliminar consorcio" (click)="onDeleteClick($event)">
+          <app-icon iconHref="assets/img/sprites.svg#trash" size="18" color="#B91C1C"></app-icon>
+        </button>
+      </div>
     </div>
     <div class="card-info">
       <app-info-row 

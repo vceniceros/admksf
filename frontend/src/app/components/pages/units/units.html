@@ -1,1 +1,89 @@
-<p>units works!</p>
+<div class="units-page">
+	<div class="page-header">
+		<div>
+			<app-label text="Unidades Funcionales" fontSize="32px" color="#1F2937"></app-label>
+			<app-label text="Registro de unidades del consorcio" fontSize="16px" color="#6B7280"></app-label>
+		</div>
+		<button class="new-unit-btn" (click)="openCreateModal()">
+			<app-icon iconHref="assets/img/sprites.svg#plus" size="16" color="#FFFFFF"></app-icon>
+			<span>Nueva Unidad</span>
+		</button>
+	</div>
+
+	<div class="table-section">
+		<app-units-table
+			[units]="units"
+			(editUnit)="openEditModal($event)"
+			(deleteUnit)="onDeleteUnit($event)">
+		</app-units-table>
+	</div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showFormModal" (click)="closeFormModal()"></div>
+<div class="modal" *ngIf="showFormModal" role="dialog" aria-modal="true">
+	<div class="modal-header">
+		<app-label [text]="isEditMode ? 'Editar unidad funcional' : 'Nueva unidad funcional'" fontSize="22px" color="#1F2937"></app-label>
+		<button class="icon-button" title="Cerrar" (click)="closeFormModal()">
+			<app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+		</button>
+	</div>
+	<form class="modal-form" [formGroup]="form" (ngSubmit)="submitForm()">
+		<label class="form-field">
+			<span>Número de unidad</span>
+			<input type="number" formControlName="numero_de_unidad_funcional" [readonly]="isEditMode" />
+		</label>
+		<label class="form-field">
+			<span>Consorcio (CUIT)</span>
+			<input type="text" formControlName="consorcio" readonly />
+		</label>
+		<label class="form-field">
+			<span>Tipo de unidad</span>
+			<select formControlName="tipo_de_unidad">
+				<option value="" disabled>Seleccionar tipo</option>
+				<option *ngFor="let tipo of tipos" [value]="tipo">{{ tipo }}</option>
+			</select>
+		</label>
+		<label class="form-field">
+			<span>Estado de vivienda</span>
+			<select formControlName="estado_de_vivienda">
+				<option value="" disabled>Seleccionar estado</option>
+				<option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+			</select>
+		</label>
+		<label class="form-field">
+			<span>Superficie (m²)</span>
+			<input type="number" step="0.01" formControlName="superficie" placeholder="45.50" />
+		</label>
+		<label class="form-field">
+			<span>DNI Propietario</span>
+			<input type="text" formControlName="propietario" placeholder="12345678" />
+		</label>
+		<div class="modal-actions">
+			<button type="button" class="cancel-button" (click)="closeFormModal()">Cancelar</button>
+			<button type="submit" class="submit-button">Guardar</button>
+		</div>
+	</form>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()"></div>
+<div class="modal delete-modal" *ngIf="showDeleteModal" role="dialog" aria-modal="true">
+	<div class="modal-header">
+		<app-label text="Eliminar unidad funcional" fontSize="22px" color="#1F2937"></app-label>
+		<button class="icon-button" title="Cerrar" (click)="closeDeleteModal()">
+			<app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+		</button>
+	</div>
+	<div class="delete-content">
+		<div class="delete-icon">
+			<app-icon iconHref="assets/img/sprites.svg#alert" size="26" color="#B91C1C"></app-icon>
+		</div>
+		<p class="delete-title">¿Seguro que quieres eliminar esta unidad?</p>
+		<p class="delete-subtitle">
+			Esta acción es irreversible y se eliminará la unidad <strong>#{{ unitToDelete?.numero }}</strong>.
+		</p>
+	</div>
+	<div class="modal-actions">
+		<button type="button" class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+		<button type="button" class="submit-button danger" (click)="confirmDelete()">Eliminar</button>
+	</div>
+</div>

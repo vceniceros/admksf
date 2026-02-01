@@ -62,6 +62,15 @@ class Migration(migrations.Migration):
                         max_digits=5,
                     ),
                 ),
+                (
+                    "imagen_url",
+                    models.CharField(
+                        blank=True,
+                        db_column="imagen_url",
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
             ],
             options={
                 "db_table": "consorcios",
@@ -69,19 +78,19 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Consorcios",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(numero__gt=0, numero__lt=60000),
+                        condition=models.Q(numero__gt=0, numero__lt=60000),
                         name="consorcios_numero_rango",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(interes_por_mora__gte=Decimal("0")),
+                        condition=models.Q(interes_por_mora__gte=Decimal("0")),
                         name="consorcios_interes_mora_gte_0",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(redondeo_aumento__gte=Decimal("0")),
+                        condition=models.Q(redondeo_aumento__gte=Decimal("0")),
                         name="consorcios_redondeo_aumento_gte_0",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(cuit__regex=r"^\d+$"),
+                        condition=models.Q(cuit__regex=r"^\d+$"),
                         name="consorcios_cuit_solo_digitos",
                     ),
                 ],

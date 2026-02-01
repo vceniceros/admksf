@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { SpendsService } from '../../../services/spends.services';
+import { ConsortiumService } from '../../../services/consortium.service';
 import { Spend, EstadoPago } from '../../../../models/spends.model';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
@@ -16,26 +17,51 @@ import { SpendingTableComponent } from '../../molecules/spending-table.component
 })
 export class Expenses implements OnInit {
   consortiumName: string = '';
+  consortiumId: string = '';
   spends: Spend[] = [];
   
   totalSpends: number = 0;
   paidSpends: number = 0;
   pendingSpends: number = 0;
 
+  showDeleteModal = false;
+  spendToDelete: Spend | null = null;
+
   constructor(
     private route: ActivatedRoute,
-    private spendsService: SpendsService
+    private spendsService: SpendsService,
+    private consortiumService: ConsortiumService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.consortiumName = params['consortiumName'];
-      this.loadSpends();
+      this.loadConsortiumData();
+    });
+  }
+
+  loadConsortiumData() {
+    this.consortiumService.getAllConsortiums().subscribe({
+      next: (consortia) => {
+        const decodedName = decodeURIComponent(this.consortiumName.replace(/-/g, ' '));
+        const found = consortia.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
+        if (found) {
+          this.consortiumId = String(found.id);
+          this.loadSpends();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading consortium:', error);
+      }
     });
   }
 
   loadSpends() {
-    this.spendsService.getAllSpends().subscribe({
+    if (!this.consortiumId) {
+      return;
+    }
+    this.spendsService.getSpendsByConsortium(this.consortiumId).subscribe({
       next: (data: Spend[]) => {
         this.spends = data;
         this.calculateBalances();
@@ -58,17 +84,40 @@ export class Expenses implements OnInit {
 
   onStatusChanged(event: { spend: Spend; newStatus: EstadoPago }): void {
     this.spendsService.updateSpendStatus(event.spend, event.newStatus).subscribe({
-      next: (updatedSpend: Spend) => {
-        // Actualizar el gasto en la lista local
-        const index = this.spends.findIndex(s => s.idGasto === updatedSpend.idGasto);
-        if (index !== -1) {
-          this.spends[index] = updatedSpend;
-          // Recalcular balances
-          this.calculateBalances();
-        }
+      next: () => {
+        this.loadSpends();
       },
       error: (error: any) => {
         console.error('Error updating spend status:', error);
+      }
+    });
+  }
+
+  onEditSpend(spend: Spend) {
+    this.router.navigate(['/dashboard', this.consortiumName, 'gastos', spend.idGasto, 'editar']);
+  }
+
+  onDeleteSpend(spend: Spend) {
+    this.spendToDelete = spend;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.spendToDelete = null;
+  }
+
+  confirmDelete() {
+    if (!this.spendToDelete) {
+      return;
+    }
+    this.spendsService.deleteSpend(this.spendToDelete.idGasto).subscribe({
+      next: () => {
+        this.closeDeleteModal();
+        this.loadSpends();
+      },
+      error: (error: any) => {
+        console.error('Error deleting spend:', error);
       }
     });
   }

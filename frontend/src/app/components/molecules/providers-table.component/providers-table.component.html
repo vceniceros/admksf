@@ -1,0 +1,31 @@
+<div class="providers-table-container">
+  <table class="providers-table">
+    <thead>
+      <tr>
+        <th>CUIT</th>
+        <th>Razón social</th>
+        <th>Ciudad</th>
+        <th>Tipo</th>
+        <th class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let provider of providers">
+        <td class="cuit">{{ provider.cuit }}</td>
+        <td>{{ provider.razon_social }}</td>
+        <td>{{ provider.ciudad || '-' }}</td>
+        <td>
+          <span class="type-badge">{{ getTipoLabel(provider.tipo_proveedor) }}</span>
+        </td>
+        <td class="actions-column">
+          <button class="icon-button" title="Editar proveedor" (click)="onEdit(provider)">
+            <app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+          </button>
+          <button class="icon-button danger" title="Eliminar proveedor" (click)="onDelete(provider)">
+            <app-icon iconHref="assets/img/sprites.svg#trash" size="18" color="#B91C1C"></app-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

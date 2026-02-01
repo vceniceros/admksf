@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
 import { LabelComponent } from '../../atoms/label.component/label.component';
@@ -12,6 +12,10 @@ import { LabelComponent } from '../../atoms/label.component/label.component';
 })
 export class DropZone {
   isDragging = false;
+
+  @Input() mainText = 'Arrastra un archivo aquí o haz clic para seleccionar';
+  @Input() helperText = 'Formatos: JPG, PDF';
+  @Input() accept = 'image/jpeg,image/jpg,application/pdf,.jpg,.jpeg,.pdf';
   
   @Output() fileDropped = new EventEmitter<File>();
 

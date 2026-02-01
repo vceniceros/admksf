@@ -1,1 +1,40 @@
-<p>payment-table.component works!</p>
+<div class="payment-table-container">
+	<table class="payment-table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Unidad</th>
+				<th>Propietario</th>
+				<th>Fecha</th>
+				<th>Monto</th>
+				<th>Estado</th>
+				<th class="actions-column">Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let payment of payments">
+				<td class="id">{{ payment.id }}</td>
+				<td>{{ payment.numeroUnidad ?? payment.unit ?? '-' }}</td>
+				<td>{{ payment.propietario ?? payment.personName ?? '-' }}</td>
+				<td>{{ formatDate(payment.fechaPago) }}</td>
+				<td class="amount">{{ formatCurrency(payment.amount) }}</td>
+				<td>
+					<span class="status-badge" [ngClass]="(payment.status || '').toLowerCase()">
+						{{ getStatusLabel(payment.status) }}
+					</span>
+				</td>
+				<td class="actions-column">
+					<button class="icon-button" title="Editar pago" (click)="onEdit(payment)">
+						<app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+					</button>
+					<button class="icon-button danger" title="Rechazar pago" (click)="onReject(payment)">
+						<app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#B91C1C"></app-icon>
+					</button>
+					<button class="icon-button" title="Enviar recibo por email" (click)="onEmail(payment)">
+						<app-icon iconHref="assets/img/sprites.svg#mail" size="18" color="#2563EB"></app-icon>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

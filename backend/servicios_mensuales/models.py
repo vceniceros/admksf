@@ -16,7 +16,7 @@ class ServicioMensual(models.Model):
     Args:
         proveedor (Proveedor): Proveedor asociado (PK).
         numero_cuenta (str): Número de cuenta.
-        numero_reclamo (str): Número de reclamo.
+        numero_reclamo (str): Teléfono de reclamo.
     """
 
     proveedor = models.OneToOneField(

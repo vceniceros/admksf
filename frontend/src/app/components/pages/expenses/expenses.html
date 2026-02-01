@@ -43,6 +43,34 @@
   </div>
 
   <div class="table-section">
-    <app-spending-table [spends]="spends" (statusChanged)="onStatusChanged($event)"></app-spending-table>
+    <app-spending-table
+      [spends]="spends"
+      (statusChanged)="onStatusChanged($event)"
+      (editSpend)="onEditSpend($event)"
+      (deleteSpend)="onDeleteSpend($event)">
+    </app-spending-table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()"></div>
+<div class="modal delete-modal" *ngIf="showDeleteModal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <app-label text="Eliminar gasto" fontSize="22px" color="#1F2937"></app-label>
+    <button class="icon-button" title="Cerrar" (click)="closeDeleteModal()">
+      <app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+    </button>
+  </div>
+  <div class="delete-content">
+    <div class="delete-icon">
+      <app-icon iconHref="assets/img/sprites.svg#alert" size="26" color="#B91C1C"></app-icon>
+    </div>
+    <p class="delete-title">¿Seguro que quieres eliminar este gasto?</p>
+    <p class="delete-subtitle">
+      Se eliminará el gasto <strong>{{ spendToDelete?.descripcion }}</strong>.
+    </p>
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+    <button type="button" class="submit-button danger" (click)="confirmDelete()">Eliminar</button>
   </div>
 </div>

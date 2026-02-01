@@ -1,59 +1,64 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of, BehaviorSubject } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Spend, EstadoPago } from '../../models/spends.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpendsService {
-  private jsonUrl = 'assets/data/spendsTest.json';
-  private localSpends: Spend[] = [];
-  private spendsSubject = new BehaviorSubject<Spend[]>([]);
+  private apiUrl = '/api/gastos/';
 
   constructor(private http: HttpClient) { }
 
   getAllSpends(): Observable<Spend[]> {
-    // Por ahora consume el JSON estático
-    // Más adelante consumirá del backend cambiando la URL
-    return this.http.get<Spend[]>(this.jsonUrl).pipe(
-      map(jsonSpends => {
-        // Combina los gastos del JSON con los gastos locales (agregados en memoria)
-        const allSpends = [...jsonSpends, ...this.localSpends];
-        return allSpends;
-      })
+    return this.http.get<{ status: string; data: any[] }>(this.apiUrl).pipe(
+      map(response => (response.data || []).map(item => this.mapSpend(item)))
+    );
+  }
+
+  getSpendsByConsortium(cuitConsorcio: string): Observable<Spend[]> {
+    return this.http.get<{ status: string; data: any[] }>(`${this.apiUrl}consorcio/${cuitConsorcio}/`).pipe(
+      map(response => (response.data || []).map(item => this.mapSpend(item)))
     );
   }
 
   getSpendById(id: number): Observable<Spend | undefined> {
-    return this.getAllSpends().pipe(
-      map(spends => spends.find(s => s.idGasto === id))
+    return this.http.get<{ status: string; data: any }>(`${this.apiUrl}${id}/`).pipe(
+      map(response => (response?.data ? this.mapSpend(response.data) : undefined))
     );
   }
 
-  addSpend(spend: Spend): Observable<Spend> {
-    // Por ahora simula agregar el gasto (en memoria para pruebas)
-    // Más adelante se conectará al backend para guardar realmente
-    this.localSpends = [...this.localSpends, spend];
-    return of(spend);
+  addSpend(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}crear/`, payload);
   }
 
-  updateSpendStatus(spend: Spend, newStatus: EstadoPago): Observable<Spend> {
-    // Actualiza el estado del gasto
-    // API: POST /api/gastos/{idGasto}/status
-    // Por ahora solo actualiza en memoria
-    const updatedSpend = { ...spend, estadoPago: newStatus };
-    
-    // Actualizar en localSpends si existe
-    const localIndex = this.localSpends.findIndex(s => s.idGasto === spend.idGasto);
-    if (localIndex !== -1) {
-      this.localSpends[localIndex] = updatedSpend;
-    }
-    
-    // TODO: Reemplazar con llamada real al backend
-    // return this.http.post<Spend>(`/api/gastos/${spend.idGasto}/status`, { estadoPago: newStatus });
-    
-    return of(updatedSpend);
+  updateSpendStatus(spend: Spend, newStatus: EstadoPago): Observable<any> {
+    return this.http.put(`${this.apiUrl}${spend.idGasto}/actualizar/`, {
+      estado_pago: newStatus
+    });
+  }
+
+  updateSpend(id: number, payload: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}${id}/actualizar/`, payload);
+  }
+
+  deleteSpend(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${id}/eliminar/`);
+  }
+
+  private mapSpend(item: any): Spend {
+    return {
+      idGasto: Number(item.id ?? item.id_gasto ?? 0),
+      cuitConsorcio: String(item.consorcio ?? item.cuit_consorcio ?? ''),
+      cuitProveedor: String(item.proveedor ?? item.cuit_proveedor ?? ''),
+      periodo: item.periodo ?? '',
+      descripcion: item.descripcion ?? '',
+      monto: Number(item.monto ?? 0),
+      fechaRegistro: item.fecha_registro ?? '',
+      tipoGasto: item.tipo_gasto ?? item.tipoGasto ?? item.tipo ?? '',
+      estadoPago: item.estado_pago ?? item.estadoPago ?? item.estado ?? ''
+    } as Spend;
   }
 }
 

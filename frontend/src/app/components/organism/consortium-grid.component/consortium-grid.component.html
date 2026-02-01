@@ -1,6 +1,106 @@
 <div class="consortium-grid">
+  <div class="add-consortium-card" (click)="onAddConsortium()" role="button" aria-label="Agregar consorcio">
+    <div class="add-consortium-icon">
+      <app-icon iconHref="assets/img/sprites.svg#plus" size="28" color="#2563EB"></app-icon>
+    </div>
+    <div class="add-consortium-text">
+      <span>Agregar consorcio</span>
+      <small>Crear un nuevo consorcio</small>
+    </div>
+    <button class="add-consortium-button" (click)="onAddConsortium(); $event.stopPropagation()">
+      Nuevo consorcio
+    </button>
+  </div>
   <app-consortium-card 
     *ngFor="let consortium of consortia" 
-    [consortium]="consortium">
+    [consortium]="consortium"
+    (deleteConsortium)="onDeleteConsortium($event)">
   </app-consortium-card>
+</div>
+
+<div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeModal()"></div>
+<div class="modal" *ngIf="showCreateModal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <app-label text="Nuevo Consorcio" fontSize="22px" color="#1F2937"></app-label>
+    <button class="icon-button" title="Cerrar" (click)="closeModal()">
+      <app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+    </button>
+  </div>
+  <div class="image-upload">
+    <app-label text="Imagen del consorcio" fontSize="14px" color="#374151"></app-label>
+    <div *ngIf="!selectedFile">
+      <app-drop-zone
+        (fileDropped)="onFileDropped($event)"
+        mainText="Arrastra una imagen aquí o haz clic para seleccionar"
+        helperText="Solo imágenes: JPG, PNG"
+        accept="image/jpeg,image/jpg,image/png,.jpg,.jpeg,.png">
+      </app-drop-zone>
+    </div>
+    <div *ngIf="selectedFile">
+      <app-file-preview [fileName]="fileName" (remove)="onFileRemove()"></app-file-preview>
+    </div>
+  </div>
+  <form class="modal-form" [formGroup]="form" (ngSubmit)="submitCreate()">
+    <label class="form-field">
+      <span>CUIT</span>
+      <input type="text" formControlName="cuit" placeholder="20304050607" />
+    </label>
+    <label class="form-field">
+      <span>Razón social</span>
+      <input type="text" formControlName="razon_social" placeholder="Complejo Las Piedras" />
+    </label>
+    <label class="form-field">
+      <span>Calle</span>
+      <input type="text" formControlName="calle" placeholder="Av. 10 de Agosto" />
+    </label>
+    <label class="form-field">
+      <span>Número</span>
+      <input type="number" formControlName="numero" min="1" />
+    </label>
+    <label class="form-field">
+      <span>Código postal</span>
+      <input type="text" formControlName="codigo_postal" placeholder="1629" />
+    </label>
+    <label class="form-field">
+      <span>Ciudad</span>
+      <input type="text" formControlName="ciudad" placeholder="Pilar" />
+    </label>
+    <label class="form-field">
+      <span>Interés por mora</span>
+      <input type="number" formControlName="interes_por_mora" min="0" step="0.01" />
+    </label>
+    <label class="form-field">
+      <span>Redondeo aumento</span>
+      <input type="number" formControlName="redondeo_aumento" min="0" step="0.01" />
+    </label>
+    <div class="modal-actions">
+      <button type="button" class="cancel-button" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="submit-button">Crear</button>
+    </div>
+  </form>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()"></div>
+<div class="modal delete-modal" *ngIf="showDeleteModal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <app-label text="Eliminar consorcio" fontSize="22px" color="#1F2937"></app-label>
+    <button class="icon-button" title="Cerrar" (click)="closeDeleteModal()">
+      <app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+    </button>
+  </div>
+  <div class="delete-content">
+    <div class="delete-icon">
+      <app-icon iconHref="assets/img/sprites.svg#alert" size="26" color="#B91C1C"></app-icon>
+    </div>
+    <p class="delete-title">¿Seguro que quieres eliminar este consorcio?</p>
+    <p class="delete-subtitle">
+      Esta acción es irreversible y se perderá toda la información del consorcio,
+      incluyendo unidades, propietarios, gastos, pagos y saldos asociados.
+      Se eliminará <strong>{{ consortiumToDelete?.name }}</strong>.
+    </p>
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+    <button type="button" class="submit-button danger" (click)="confirmDelete()">Eliminar</button>
+  </div>
 </div>

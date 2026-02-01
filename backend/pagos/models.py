@@ -17,6 +17,14 @@ from shared import (
 )
 
 
+class EstadoPago(models.TextChoices):
+    """Estados permitidos de un pago."""
+
+    APROBADO = "Aprobado", "Aprobado"
+    PENDIENTE = "Pendiente", "Pendiente"
+    PARCIAL = "Parcial", "Parcial"
+
+
 class Pago(models.Model):
     """Representa un pago realizado por un propietario.
 
@@ -49,6 +57,12 @@ class Pago(models.Model):
         db_column="monto",
         validators=[min_value_validator(Decimal("0.01"), "Monto")],
     )
+    estado_pago = models.CharField(
+        max_length=20,
+        db_column="estado_pago",
+        choices=EstadoPago.choices,
+        default=EstadoPago.PENDIENTE,
+    )
     fecha_pago = models.DateTimeField(db_column="fecha_pago", default=timezone.now)
 
     class Meta:
@@ -57,8 +71,12 @@ class Pago(models.Model):
         verbose_name_plural = "Pagos"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(monto__gt=0),
+                condition=models.Q(monto__gt=0),
                 name="pagos_monto_gt_0",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(estado_pago__in=list(EstadoPago.values)),
+                name="pagos_estado_pago_valido",
             ),
             models.UniqueConstraint(
                 fields=["id_pago", "numero_de_unidad_funcional", "consorcio"],
@@ -91,6 +109,7 @@ class Pago(models.Model):
                 ("cuit_consorcio", self.consorcio_id, True),
                 ("dni_propietario", self.propietario_id, True),
                 ("monto", self.monto, False),
+                ("estado_pago", self.estado_pago, False),
                 ("fecha_pago", self.fecha_pago, False),
             ],
         )

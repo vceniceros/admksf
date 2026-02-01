@@ -96,15 +96,15 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Saldos mensuales",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(saldo_inicial__gte=Decimal("0")),
+                        condition=models.Q(saldo_inicial__gte=Decimal("0")),
                         name="saldo_mensual_saldo_inicial_gte_0",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(total_gastos__gte=Decimal("0")),
+                        condition=models.Q(total_gastos__gte=Decimal("0")),
                         name="saldo_mensual_total_gastos_gte_0",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(total_pagos__gte=Decimal("0")),
+                        condition=models.Q(total_pagos__gte=Decimal("0")),
                         name="saldo_mensual_total_pagos_gte_0",
                     ),
                     models.UniqueConstraint(

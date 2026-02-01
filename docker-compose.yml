@@ -10,7 +10,7 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=S4br1n4b0t0n4
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   # SERVICIO 2: Django + Angular
   web:

@@ -70,15 +70,15 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Proveedores",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(numero__gt=0, numero__lt=60000),
+                        condition=models.Q(numero__gt=0, numero__lt=60000),
                         name="proveedores_numero_rango",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(cuit__regex=r"^\d+$"),
+                        condition=models.Q(cuit__regex=r"^\d+$"),
                         name="proveedores_cuit_solo_digitos",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(
+                        condition=models.Q(
                             tipo_proveedor__in=[
                                 "servicios_mensuales",
                                 "reparaciones_mantenimientos",

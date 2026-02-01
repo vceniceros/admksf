@@ -15,7 +15,7 @@ class ReparacionMantenimiento(models.Model):
 
     Args:
         proveedor (Proveedor): Proveedor asociado (PK).
-        numero_reclamo (str): Número de reclamo.
+        numero_reclamo (str): Teléfono de reclamo.
     """
 
     proveedor = models.OneToOneField(

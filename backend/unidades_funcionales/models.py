@@ -24,6 +24,13 @@ class EstadoVivienda(models.TextChoices):
     VACIO = "Vacio", "Vacío"
 
 
+class TipoUnidad(models.TextChoices):
+    """Tipos permitidos de unidad funcional."""
+
+    DEPARTAMENTO = "Departamento", "Departamento"
+    LOTE = "Lote", "Lote"
+
+
 class UnidadFuncional(models.Model):
     """Representa una unidad funcional de un consorcio.
 
@@ -46,7 +53,11 @@ class UnidadFuncional(models.Model):
         db_column="cuit_consorcio",
         to_field="cuit",
     )
-    tipo_de_unidad = models.CharField(max_length=50, db_column="tipo_de_unidad")
+    tipo_de_unidad = models.CharField(
+        max_length=50,
+        db_column="tipo_de_unidad",
+        choices=TipoUnidad.choices,
+    )
     estado_de_vivienda = models.CharField(
         max_length=50,
         db_column="estado_de_vivienda",
@@ -71,11 +82,15 @@ class UnidadFuncional(models.Model):
         verbose_name_plural = "Unidades funcionales"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(estado_de_vivienda__in=list(EstadoVivienda.values)),
+                condition=models.Q(tipo_de_unidad__in=list(TipoUnidad.values)),
+                name="unidades_funcionales_tipo_valido",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(estado_de_vivienda__in=list(EstadoVivienda.values)),
                 name="unidades_funcionales_estado_valido",
             ),
             models.CheckConstraint(
-                check=models.Q(superficie__gt=0),
+                condition=models.Q(superficie__gt=0),
                 name="unidades_funcionales_superficie_gt_0",
             ),
             models.UniqueConstraint(

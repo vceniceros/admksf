@@ -1,0 +1,31 @@
+<div class="owners-table-container">
+  <table class="owners-table">
+    <thead>
+      <tr>
+        <th>DNI</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let owner of owners">
+        <td class="dni">{{ owner.dni }}</td>
+        <td>{{ owner.nombre }}</td>
+        <td>{{ owner.apellido }}</td>
+        <td>{{ owner.telefono || '-' }}</td>
+        <td>{{ owner.email || '-' }}</td>
+        <td class="actions-column">
+          <button class="icon-button" title="Editar propietario" (click)="onEdit(owner)">
+            <app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+          </button>
+          <button class="icon-button danger" title="Eliminar propietario" (click)="onDelete(owner)">
+            <app-icon iconHref="assets/img/sprites.svg#trash" size="18" color="#B91C1C"></app-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

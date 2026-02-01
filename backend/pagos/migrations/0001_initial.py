@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Pagos",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(monto__gt=Decimal("0")),
+                        condition=models.Q(monto__gt=Decimal("0")),
                         name="pagos_monto_gt_0",
                     ),
                     models.UniqueConstraint(

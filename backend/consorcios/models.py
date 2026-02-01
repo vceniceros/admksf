@@ -63,6 +63,12 @@ class Consorcio(models.Model):
         db_column="redondeo_aumento",
         validators=[min_value_validator(Decimal("0"), "Redondeo de aumento")],
     )
+    imagen_url = models.CharField(
+        max_length=255,
+        db_column="imagen_url",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         db_table = "consorcios"
@@ -70,19 +76,19 @@ class Consorcio(models.Model):
         verbose_name_plural = "Consorcios"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(numero__gt=0, numero__lt=60000),
+                condition=models.Q(numero__gt=0, numero__lt=60000),
                 name="consorcios_numero_rango",
             ),
             models.CheckConstraint(
-                check=models.Q(interes_por_mora__gte=0),
+                condition=models.Q(interes_por_mora__gte=0),
                 name="consorcios_interes_mora_gte_0",
             ),
             models.CheckConstraint(
-                check=models.Q(redondeo_aumento__gte=0),
+                condition=models.Q(redondeo_aumento__gte=0),
                 name="consorcios_redondeo_aumento_gte_0",
             ),
             models.CheckConstraint(
-                check=models.Q(cuit__regex=r"^\d+$"),
+                condition=models.Q(cuit__regex=r"^\d+$"),
                 name="consorcios_cuit_solo_digitos",
             ),
         ]
@@ -118,5 +124,6 @@ class Consorcio(models.Model):
                 ("ciudad", self.ciudad, False),
                 ("interes_por_mora", self.interes_por_mora, False),
                 ("redondeo_aumento", self.redondeo_aumento, False),
+                ("imagen_url", self.imagen_url, True),
             ],
         )

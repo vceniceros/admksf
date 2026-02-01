@@ -106,11 +106,11 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Gastos",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(monto__gt=Decimal("0")),
+                        condition=models.Q(monto__gt=Decimal("0")),
                         name="gastos_monto_gt_0",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(
+                        condition=models.Q(
                             tipo_gasto__in=[
                                 "Mantenimiento",
                                 "Servicios",
@@ -123,7 +123,7 @@ class Migration(migrations.Migration):
                         name="gastos_tipo_gasto_valido",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(estado_pago__in=["Pendiente", "Pagado"]),
+                        condition=models.Q(estado_pago__in=["Pendiente", "Pagado"]),
                         name="gastos_estado_pago_valido",
                     ),
                 ],

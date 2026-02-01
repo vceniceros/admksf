@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Propietarios",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(dni__regex=r"^\d+$"),
+                        condition=models.Q(dni__regex=r"^\d+$"),
                         name="propietarios_dni_solo_digitos",
                     )
                 ],

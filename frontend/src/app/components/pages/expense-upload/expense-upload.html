@@ -10,7 +10,12 @@
     <div class="upload-section">
       <app-label text="Subir Recibo (Opcional)" fontSize="20px" color="#1F2937"></app-label>
       <div *ngIf="!selectedFile">
-        <app-drop-zone (fileDropped)="onFileDropped($event)"></app-drop-zone>
+        <app-drop-zone
+          (fileDropped)="onFileDropped($event)"
+          mainText="Arrastra un recibo aquí o haz clic para seleccionar"
+          helperText="Formatos: JPG, PNG o PDF"
+          accept="image/jpeg,image/jpg,image/png,application/pdf,.jpg,.jpeg,.png,.pdf">
+        </app-drop-zone>
       </div>
       <div *ngIf="selectedFile">
         <app-file-preview [fileName]="fileName" (remove)="onFileRemove()"></app-file-preview>

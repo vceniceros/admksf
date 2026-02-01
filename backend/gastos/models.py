@@ -91,15 +91,15 @@ class Gasto(models.Model):
         verbose_name_plural = "Gastos"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(monto__gt=0),
+                condition=models.Q(monto__gt=0),
                 name="gastos_monto_gt_0",
             ),
             models.CheckConstraint(
-                check=models.Q(tipo_gasto__in=list(TipoGasto.values)),
+                condition=models.Q(tipo_gasto__in=list(TipoGasto.values)),
                 name="gastos_tipo_gasto_valido",
             ),
             models.CheckConstraint(
-                check=models.Q(estado_pago__in=list(EstadoPago.values)),
+                condition=models.Q(estado_pago__in=list(EstadoPago.values)),
                 name="gastos_estado_pago_valido",
             ),
         ]

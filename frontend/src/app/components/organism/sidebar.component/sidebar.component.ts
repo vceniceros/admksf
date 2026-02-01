@@ -17,6 +17,10 @@ export class SidebarComponent implements OnInit {
   
   dashboardRoute: string = '';
   ownersRoute: string = '';
+  unitsRoute: string = '';
+  providersRoute: string = '';
+  paymentsRoute: string = '';
+  monthlyBalanceRoute: string = '';
   expensesRoute: string = '';
 
   constructor(
@@ -44,6 +48,10 @@ export class SidebarComponent implements OnInit {
       this.consortiumName = match[1];
       this.dashboardRoute = `/dashboard/${this.consortiumName}`;
       this.ownersRoute = `/dashboard/${this.consortiumName}/propietarios`; // Ajustar cuando exista la ruta
+      this.unitsRoute = `/dashboard/${this.consortiumName}/unidades`;
+      this.providersRoute = `/dashboard/${this.consortiumName}/proveedores`;
+      this.paymentsRoute = `/dashboard/${this.consortiumName}/pagos`;
+      this.monthlyBalanceRoute = `/dashboard/${this.consortiumName}/saldos-mensuales`;
       this.expensesRoute = `/dashboard/${this.consortiumName}/gastos`;
     }
   }

@@ -84,13 +84,13 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "Unidades funcionales",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(
+                        condition=models.Q(
                             estado_de_vivienda__in=["Propietario", "Inquilino", "Vacio"]
                         ),
                         name="unidades_funcionales_estado_valido",
                     ),
                     models.CheckConstraint(
-                        check=models.Q(superficie__gt=Decimal("0")),
+                        condition=models.Q(superficie__gt=Decimal("0")),
                         name="unidades_funcionales_superficie_gt_0",
                     ),
                     models.UniqueConstraint(

@@ -1,0 +1,65 @@
+<div class="consortium-form-page">
+  <div class="page-header">
+    <div>
+      <app-label
+        [text]="isEditMode ? 'Editar Consorcio' : 'Nuevo Consorcio'"
+        fontSize="32px"
+        color="#1F2937">
+      </app-label>
+      <app-label
+        [text]="isEditMode ? 'Actualiza los datos del consorcio' : 'Carga los datos para crear un consorcio'"
+        fontSize="16px"
+        color="#6B7280">
+      </app-label>
+    </div>
+  </div>
+
+  <form class="form-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <label class="form-field">
+        <span>CUIT</span>
+        <input type="text" formControlName="cuit" placeholder="20304050607" />
+      </label>
+
+      <label class="form-field">
+        <span>Razón social</span>
+        <input type="text" formControlName="razon_social" placeholder="Complejo Las Piedras" />
+      </label>
+
+      <label class="form-field">
+        <span>Calle</span>
+        <input type="text" formControlName="calle" placeholder="Av. 10 de Agosto" />
+      </label>
+
+      <label class="form-field">
+        <span>Número</span>
+        <input type="number" formControlName="numero" min="1" />
+      </label>
+
+      <label class="form-field">
+        <span>Código postal</span>
+        <input type="text" formControlName="codigo_postal" placeholder="1629" />
+      </label>
+
+      <label class="form-field">
+        <span>Ciudad</span>
+        <input type="text" formControlName="ciudad" placeholder="Pilar" />
+      </label>
+
+      <label class="form-field">
+        <span>Interés por mora</span>
+        <input type="number" formControlName="interes_por_mora" min="0" step="0.01" />
+      </label>
+
+      <label class="form-field">
+        <span>Redondeo aumento</span>
+        <input type="number" formControlName="redondeo_aumento" min="0" step="0.01" />
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="cancel-button" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="submit-button">Guardar</button>
+    </div>
+  </form>
+</div>
