@@ -40,12 +40,25 @@ COPY ./backend ./
 
 # Copiamos los archivos compilados de Angular (desde la etapa 1) a Django
 
-# 1. Copiamos los estaticos (JS, CSS) 
-COPY --from=build-step /app/dist/frontend/browser /app/static_angular
+# 1. Copiamos la salida de Angular
+COPY --from=build-step /app/dist/frontend /app/dist_frontend
 
-# 2. Movemos el index.html a la carpeta de templates de Django
-# (Asegúrate de tener una carpeta 'templates' creada en tu proyecto Django o créala aquí)
-RUN mkdir -p /app/templates
+# 2. Normalizamos el contenido estático (según estructura del build)
+RUN mkdir -p /app/static_angular /app/templates
+RUN if [ -f /app/dist_frontend/index.html ]; then \
+            cp -r /app/dist_frontend/* /app/static_angular/; \
+        elif [ -f /app/dist_frontend/browser/index.html ]; then \
+            cp -r /app/dist_frontend/browser/* /app/static_angular/; \
+        elif [ -f /app/dist_frontend/browser/index.csr.html ]; then \
+            cp -r /app/dist_frontend/browser/* /app/static_angular/; \
+        else \
+            echo "No se encontró index.html en el build de Angular" && ls -la /app/dist_frontend && exit 1; \
+        fi
+
+# 3. Normalizamos index.html y lo movemos a templates
+RUN if [ ! -f /app/static_angular/index.html ] && [ -f /app/static_angular/index.csr.html ]; then \
+            mv /app/static_angular/index.csr.html /app/static_angular/index.html; \
+        fi
 RUN mv /app/static_angular/index.html /app/templates/index.html
 
 # Recolectar estaticos (WhiteNoise los servirá)

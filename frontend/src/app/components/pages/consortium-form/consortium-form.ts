@@ -86,7 +86,8 @@ export class ConsortiumForm implements OnInit {
     this.consortiumService.createConsortium(formValue).subscribe({
       next: () => this.router.navigate(['/']),
       error: (error: any) => {
-        alert('Error al crear consorcio.');
+        const message = this.getErrorMessage(error, 'Error al crear consorcio.');
+        alert(message);
         console.error('Error al crear consorcio:', error);
       }
     });
@@ -94,5 +95,17 @@ export class ConsortiumForm implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/']);
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    const apiMessage = error?.error?.message || error?.message;
+    const apiErrors = error?.error?.errors;
+    if (apiErrors && typeof apiErrors === 'object') {
+      const details = Object.entries(apiErrors)
+        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : String(messages)}`)
+        .join(' | ');
+      return `${apiMessage || fallback} (${details})`;
+    }
+    return apiMessage || fallback;
   }
 }

@@ -2,6 +2,14 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
+    path: 'consorcios/nuevo',
+    renderMode: RenderMode.Server
+  },
+  {
+    path: 'consorcios/:consortiumId/editar',
+    renderMode: RenderMode.Server
+  },
+  {
     path: 'dashboard/:consortiumName',
     renderMode: RenderMode.Server
   },
@@ -47,10 +55,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: '',
-    renderMode: RenderMode.Prerender
+    renderMode: RenderMode.Server
   },
   {
     path: '**',
-    renderMode: RenderMode.Prerender
+    renderMode: RenderMode.Server
   }
 ];

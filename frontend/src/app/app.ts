@@ -1,5 +1,5 @@
 import { Component, signal, OnInit, HostListener } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd, NavigationStart, NavigationCancel, NavigationError } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { IconComponent } from './components/atoms/icon.component/icon.component';
 import { GenericButtonComponent } from './components/atoms/generic-button.component/generic-button.component';
@@ -23,6 +23,13 @@ import { FooterComponent } from './components/organism/footer.component/footer.c
         <main [class]="showSidebar ? 'main-with-sidebar' : 'main-no-sidebar'">
            <router-outlet></router-outlet>
         </main>
+
+        <div class="loading-overlay" *ngIf="isLoading">
+          <div class="loading-content">
+            <div class="spinner" aria-label="Cargando" role="status"></div>
+            <span class="loading-text">Cargando...</span>
+          </div>
+        </div>
       </div>
       <app-footer></app-footer>
     </div>
@@ -35,10 +42,26 @@ export class App implements OnInit {
   protected readonly title = signal('frontend');
   isSidebarOpen = false;
   showSidebar = false; // Controla si se muestra el sidebar (no en la página de selección)
+  isLoading = true;
+  private pendingNavigation = 0;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.pendingNavigation += 1;
+        this.isLoading = true;
+      }
+
+      if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+        this.pendingNavigation = Math.max(0, this.pendingNavigation - 1);
+        if (this.pendingNavigation === 0) {
+          this.isLoading = false;
+        }
+      }
+    });
+
     // Detectar cambios de ruta
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
