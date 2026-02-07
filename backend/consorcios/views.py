@@ -13,6 +13,7 @@ import os
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+from json import JSONDecodeError
 
 from .services import ConsorcioService
 
@@ -45,10 +46,20 @@ def crear_consorcio(request):
                 "imagen_url": consorcio.imagen_url,
             }
         }, status=201)
-    except ValidationError as e:
+    except JSONDecodeError:
         return JsonResponse({
             "status": "error",
-            "message": str(e.messages),
+            "message": "JSON inválido en el cuerpo de la solicitud.",
+            "errors": {
+                "body": ["No se pudo interpretar el JSON enviado."]
+            }
+        }, status=400)
+    except ValidationError as e:
+        error_details = e.message_dict if hasattr(e, "message_dict") else {"non_field_errors": e.messages}
+        return JsonResponse({
+            "status": "error",
+            "message": "Error de validación al crear consorcio.",
+            "errors": error_details,
         }, status=400)
     except Exception as e:
         return JsonResponse({
@@ -127,10 +138,20 @@ def actualizar_consorcio(request, cuit):
                 "imagen_url": consorcio.imagen_url,
             }
         })
-    except ValidationError as e:
+    except JSONDecodeError:
         return JsonResponse({
             "status": "error",
-            "message": str(e.messages),
+            "message": "JSON inválido en el cuerpo de la solicitud.",
+            "errors": {
+                "body": ["No se pudo interpretar el JSON enviado."]
+            }
+        }, status=400)
+    except ValidationError as e:
+        error_details = e.message_dict if hasattr(e, "message_dict") else {"non_field_errors": e.messages}
+        return JsonResponse({
+            "status": "error",
+            "message": "Error de validación al actualizar consorcio.",
+            "errors": error_details,
         }, status=400)
     except Exception as e:
         return JsonResponse({

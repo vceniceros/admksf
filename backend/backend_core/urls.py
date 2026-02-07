@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/caratulas/', include('caratula.urls')),
     path('api/reparaciones-mantenimientos/', include('reparaciones_mantenimientos.urls')),
     path('api/servicios-mensuales/', include('servicios_mensuales.urls')),
+    re_path(r'^(?!api/|admin/).*$' , TemplateView.as_view(template_name='index.html'), name='spa-fallback'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,14 +5,47 @@ Fecha:
 """
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from decimal import Decimal
+import re
 
 from .models import Consorcio
 
 
 class ConsorcioService:
     """Servicio para gestionar operaciones CRUD de Consorcios."""
+
+    @staticmethod
+    def _normalize_payload(datos: dict) -> dict:
+        """Normaliza y limpia datos del consorcio."""
+        if not isinstance(datos, dict):
+            return {}
+
+        cleaned = dict(datos)
+
+        cuit = cleaned.get("cuit")
+        if cuit is not None:
+            cleaned["cuit"] = re.sub(r"\D", "", str(cuit))
+
+        for field in ("razon_social", "calle", "codigo_postal", "ciudad"):
+            if field in cleaned and cleaned[field] is not None:
+                cleaned[field] = str(cleaned[field]).strip()
+
+        numero = cleaned.get("numero")
+        if numero is not None and numero != "":
+            try:
+                cleaned["numero"] = int(str(numero).replace(",", "."))
+            except (TypeError, ValueError):
+                cleaned["numero"] = numero
+
+        for field in ("interes_por_mora", "redondeo_aumento"):
+            value = cleaned.get(field)
+            if value is not None and value != "":
+                try:
+                    cleaned[field] = Decimal(str(value).replace(",", "."))
+                except (TypeError, ValueError):
+                    cleaned[field] = value
+
+        return cleaned
 
     @staticmethod
     def crear_consorcio(datos: dict) -> Consorcio:
@@ -28,7 +61,8 @@ class ConsorcioService:
             ValidationError: Si los datos son inválidos.
         """
         try:
-            consorcio = Consorcio(**datos)
+            datos_limpios = ConsorcioService._normalize_payload(datos)
+            consorcio = Consorcio(**datos_limpios)
             consorcio.full_clean()
             consorcio.save()
             return consorcio
@@ -76,7 +110,8 @@ class ConsorcioService:
         """
         try:
             consorcio = Consorcio.objects.get(pk=cuit)
-            for key, value in datos.items():
+            datos_limpios = ConsorcioService._normalize_payload(datos)
+            for key, value in datos_limpios.items():
                 if hasattr(consorcio, key):
                     setattr(consorcio, key, value)
             consorcio.full_clean()
