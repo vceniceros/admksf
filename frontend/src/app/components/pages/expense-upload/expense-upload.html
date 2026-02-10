@@ -9,6 +9,10 @@
   <div class="upload-container">
     <div class="upload-section">
       <app-label text="Subir Recibo (Opcional)" fontSize="20px" color="#1F2937"></app-label>
+      <div *ngIf="isExtracting" class="loading-indicator">
+        <span class="spinner"></span>
+        <span>Procesando recibo...</span>
+      </div>
       <div *ngIf="!selectedFile">
         <app-drop-zone
           (fileDropped)="onFileDropped($event)"
@@ -30,7 +34,7 @@
         <button class="cancel-button" (click)="onCancel()">
           Cancelar
         </button>
-        <button class="submit-button" (click)="onSubmit()" [disabled]="expenseForm.invalid">
+        <button class="submit-button" (click)="onSubmit()" [disabled]="expenseForm.invalid || isExtracting">
           Guardar Gasto
         </button>
       </div>

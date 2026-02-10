@@ -7,12 +7,14 @@ Fecha:
 from __future__ import annotations
 
 from decimal import Decimal
+import io
 import re
 from typing import Iterable, Tuple
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
-
+from pdf2image import convert_from_bytes
+from google.cloud import vision
 from .constants import ERROR_PREFIX, MASK_CHAR, MASK_EMPTY_VALUE
 
 
@@ -253,3 +255,92 @@ def build_model_str(model_name: str, fields: Iterable[Tuple[str, object, bool]])
 
     parts = [format_field(name, value, mask) for name, value, mask in fields]
     return f"{model_name}({', '.join(parts)})"
+
+def extract_text_from_img_by_vision(image_content: bytes) -> str:
+    """Extrae texto de una imagen utilizando vision cloud ai de google cloud.
+
+    Args:
+        image_path (str): Ruta a la imagen.
+
+    Returns:
+        str: Texto extraído de la imagen.
+    """
+    client = vision.ImageAnnotatorClient()
+    image = vision.Image(content=image_content)
+    response = client.text_detection(image=image)
+
+    if response.error.message:
+        raise Exception(f"Error al procesar la imagen: {response.error.message}")
+    if response.text_annotations:
+        return response.text_annotations[0].description
+    return ""
+
+
+def parse_invoice_data(text: str) -> dict:
+    """Parsea datos de una factura desde el texto extraído.
+
+    Args:
+        text (str): Texto extraído de la imagen.
+
+    Returns:
+        dict: Datos parseados de la factura.
+    """
+    data = {
+        "raw_text": text,
+        "fecha": None,
+        "numero_factura": None,
+        "importe_total": None,
+        "cuit_proveedor": None,
+        "periodo_facturado": None,
+        "descripcion": None,
+        "fecha_vencimiento": None,
+    }
+
+    fecha_match = re.search(r"Fecha[:\s]+(\d{2}/\d{2}/\d{4})", text, re.IGNORECASE)
+    importe_match = re.search(r"(Total|Importe)[:\s]+\$?([\d.,]+)", text, re.IGNORECASE)
+    cuit_match = re.search(r"CUIT[:\s]+(\d{2}-\d{8}-\d)", text, re.IGNORECASE)
+    numero_factura_match = re.search(r"N(ro|ro\.|úmero|º)[:\s]+([\w-]+)", text, re.IGNORECASE)
+    periodo_match = re.search(r"Periodo[:\s]+(\d{2}/\d{4})", text, re.IGNORECASE)
+    fecha_vencimiento_match = re.search(r"Vencimiento[:\s]+(\d{2}/\d{2}/\d{4})", text, re.IGNORECASE)
+
+    if fecha_match:
+        data["fecha"] = fecha_match.group(1)
+    if importe_match:
+        data["importe_total"] = importe_match.group(2)
+    if cuit_match:
+        data["cuit_proveedor"] = cuit_match.group(1)
+    if numero_factura_match:
+        data["numero_factura"] = numero_factura_match.group(2)
+    if periodo_match:
+        data["periodo_facturado"] = periodo_match.group(1)
+    if fecha_vencimiento_match:
+        data["fecha_vencimiento"] = fecha_vencimiento_match.group(1)
+
+    return data
+
+def process_file(file_obj) -> dict:
+    """Procesa un pdf o imagen y orquesta la estrategia de extracción de datos.
+
+    Args:
+        file_obj: Archivo a procesar.
+
+    Returns:
+        str: Contenido del archivo como texto.
+    """
+    file_bytes = file_obj.read()
+    content_type = (file_obj.content_type or "").lower()
+   
+    full_text = ""
+    if "pdf" in content_type:
+        images = convert_from_bytes(file_bytes)
+        if images:
+            for image in images:
+                image_buffer = io.BytesIO()
+                image.save(image_buffer, format="JPEG")
+                image_bytes = image_buffer.getvalue()
+                full_text += extract_text_from_img_by_vision(image_bytes) + "\n"
+    else:
+        full_text = extract_text_from_img_by_vision(file_bytes)
+
+    return parse_invoice_data(full_text)
+

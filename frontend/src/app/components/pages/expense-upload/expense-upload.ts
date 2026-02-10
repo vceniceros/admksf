@@ -9,6 +9,7 @@ import { FilePreview } from '../../molecules/file-preview/file-preview';
 import { ExpenseForm } from '../../organism/expense-form/expense-form';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { ConsortiumService } from '../../../services/consortium.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-expense-upload',
@@ -32,6 +33,7 @@ export class ExpenseUpload implements OnInit {
   consortiumId: string = '';
   isEditMode = false;
   expenseId: number | null = null;
+  isExtracting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -113,7 +115,20 @@ export class ExpenseUpload implements OnInit {
     }
     this.selectedFile = file;
     this.fileName = file.name;
-    // Por ahora no procesamos con OCR, solo guardamos la referencia del archivo
+    this.isExtracting = true;
+    this.spendsService.extractSpendFromFile(file)
+      .pipe(finalize(() => {
+        this.isExtracting = false;
+      }))
+      .subscribe({
+        next: (response) => {
+          const data = response?.data || {};
+          this.applyExtractedData(data);
+        },
+        error: (error) => {
+          console.error('Error al extraer datos del archivo:', error);
+        }
+      });
   }
 
   onFileRemove() {
@@ -147,6 +162,18 @@ export class ExpenseUpload implements OnInit {
         return;
       }
 
+      if (this.selectedFile) {
+        this.spendsService.addSpendFromFile(payload, this.selectedFile).subscribe({
+          next: () => {
+            this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
+          },
+          error: (error: any) => {
+            console.error('Error al cargar gasto desde archivo:', error);
+          }
+        });
+        return;
+      }
+
       this.spendsService.addSpend(payload).subscribe({
         next: () => {
           this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
@@ -165,5 +192,56 @@ export class ExpenseUpload implements OnInit {
 
   onCancel() {
     this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
+  }
+
+  private applyExtractedData(data: any) {
+    const patch: any = {};
+
+    if (data.cuit_proveedor) {
+      patch.cuitProveedor = String(data.cuit_proveedor);
+    }
+
+    if (data.descripcion) {
+      patch.descripcion = String(data.descripcion);
+    }
+
+    if (data.monto) {
+      const montoStr = String(data.monto).replace(/\./g, '').replace(',', '.');
+      const montoValue = Number(montoStr);
+      if (!Number.isNaN(montoValue)) {
+        patch.monto = montoValue;
+      }
+    }
+
+    if (data.periodo) {
+      const periodoValue = this.normalizePeriodo(String(data.periodo));
+      if (periodoValue) {
+        patch.periodo = periodoValue;
+      }
+    }
+
+    this.expenseForm.patchValue(patch);
+  }
+
+  private normalizePeriodo(periodo: string): string | null {
+    if (!periodo) {
+      return null;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(periodo)) {
+      return periodo;
+    }
+
+    if (/^\d{2}\/\d{4}$/.test(periodo)) {
+      const [month, year] = periodo.split('/');
+      return `${year}-${month}-01`;
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(periodo)) {
+      const [day, month, year] = periodo.split('/');
+      return `${year}-${month}-${day}`;
+    }
+
+    return null;
   }
 }

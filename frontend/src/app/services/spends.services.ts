@@ -33,6 +33,23 @@ export class SpendsService {
     return this.http.post(`${this.apiUrl}crear/`, payload);
   }
 
+  addSpendFromFile(payload: any, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('archivo', file);
+    Object.entries(payload || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        formData.append(key, String(value));
+      }
+    });
+    return this.http.post(`${this.apiUrl}cargar-desde-archivo/`, formData);
+  }
+
+  extractSpendFromFile(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('archivo', file);
+    return this.http.post(`${this.apiUrl}extraer-desde-archivo/`, formData);
+  }
+
   updateSpendStatus(spend: Spend, newStatus: EstadoPago): Observable<any> {
     return this.http.put(`${this.apiUrl}${spend.idGasto}/actualizar/`, {
       estado_pago: newStatus

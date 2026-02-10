@@ -2,3 +2,5 @@ psycopg2-binary>=2.9
 whitenoise
 gunicorn
 django
+google-cloud-vision
+pdf2image

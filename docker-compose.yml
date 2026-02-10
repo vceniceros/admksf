@@ -27,6 +27,9 @@ services:
       - DB_PORT=5432
       - DJANGO_SECRET_KEY=B0k4v4S4l1rc@mp30n
       - DJANGO_DEBUG=True
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/vision.json
+    volumes:
+      - ./backend/backend_core/our-ratio-483700-u2-c0488bd269ae.json:/app/credentials/vision.json:ro
     command: gunicorn --bind 0.0.0.0:8000 backend_core.wsgi:application
 
 volumes:

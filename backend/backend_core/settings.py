@@ -154,3 +154,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(BASE_DIR / "backend_core" / "our-ratio-483700-u2-c0488bd269ae.json")
+
