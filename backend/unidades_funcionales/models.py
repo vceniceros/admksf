@@ -29,6 +29,7 @@ class TipoUnidad(models.TextChoices):
 
     DEPARTAMENTO = "Departamento", "Departamento"
     LOTE = "Lote", "Lote"
+    PH = "PH", "PH"
 
 
 class UnidadFuncional(models.Model):

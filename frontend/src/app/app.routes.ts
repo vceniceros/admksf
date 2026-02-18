@@ -50,6 +50,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/pages/payment-upload/payment-upload').then(m => m.PaymentUpload)
   },
   {
+    path: 'dashboard/:consortiumName/expensas',
+    loadComponent: () => import('./components/pages/settlement/settlement').then(m => m.SettlementComponent)
+  },
+  {
     path: 'dashboard/:consortiumName/gastos/carga-de-gasto',
     loadComponent: () => import('./components/pages/expense-upload/expense-upload').then(m => m.ExpenseUpload)
   },

@@ -22,6 +22,7 @@ export class SidebarComponent implements OnInit {
   paymentsRoute: string = '';
   monthlyBalanceRoute: string = '';
   expensesRoute: string = '';
+  settlementRoute: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -53,6 +54,7 @@ export class SidebarComponent implements OnInit {
       this.paymentsRoute = `/dashboard/${this.consortiumName}/pagos`;
       this.monthlyBalanceRoute = `/dashboard/${this.consortiumName}/saldos-mensuales`;
       this.expensesRoute = `/dashboard/${this.consortiumName}/gastos`;
+      this.settlementRoute = `/dashboard/${this.consortiumName}/expensas`;
     }
   }
 }

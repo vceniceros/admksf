@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'saldo_mensual',
     'pagos',
     'caratula',
+    'expensas',
 ]
 
 MIDDLEWARE = [

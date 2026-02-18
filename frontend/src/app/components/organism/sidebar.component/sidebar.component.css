@@ -7,6 +7,9 @@
   padding: 16px 8px;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
   align-self: stretch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 
 /* En mobile: fixed positioning y control de visibilidad */

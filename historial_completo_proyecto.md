@@ -27796,3 +27796,1118 @@ Date:   Fri Feb 6 21:26:00 2026 -0300
 ```
 
 ---
+## Commit: 815a4f3
+**Fecha:** Fri Feb 6 21:36:31 2026 -0300
+**Mensaje:** agrego documentacion legacy
+
+#### 📄 `Dockerfile`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -40,12 +40,25 @@ COPY ./backend ./
+ 
+ # Copiamos los archivos compilados de Angular (desde la etapa 1) a Django
+ 
+-# 1. Copiamos los estaticos (JS, CSS) 
+-COPY --from=build-step /app/dist/frontend/browser /app/static_angular
++# 1. Copiamos la salida de Angular
++COPY --from=build-step /app/dist/frontend /app/dist_frontend
+ 
+-# 2. Movemos el index.html a la carpeta de templates de Django
+-# (Asegúrate de tener una carpeta 'templates' creada en tu proyecto Django o créala aquí)
+-RUN mkdir -p /app/templates
++# 2. Normalizamos el contenido estático (según estructura del build)
++RUN mkdir -p /app/static_angular /app/templates
++RUN if [ -f /app/dist_frontend/index.html ]; then \
++            cp -r /app/dist_frontend/* /app/static_angular/; \
++        elif [ -f /app/dist_frontend/browser/index.html ]; then \
++            cp -r /app/dist_frontend/browser/* /app/static_angular/; \
++        elif [ -f /app/dist_frontend/browser/index.csr.html ]; then \
++            cp -r /app/dist_frontend/browser/* /app/static_angular/; \
++        else \
++            echo "No se encontró index.html en el build de Angular" && ls -la /app/dist_frontend && exit 1; \
++        fi
++
++# 3. Normalizamos index.html y lo movemos a templates
++RUN if [ ! -f /app/static_angular/index.html ] && [ -f /app/static_angular/index.csr.html ]; then \
++            mv /app/static_angular/index.csr.html /app/static_angular/index.html; \
++        fi
+ RUN mv /app/static_angular/index.html /app/templates/index.html
+ 
+ # Recolectar estaticos (WhiteNoise los servirá)
+```
+
+#### 📄 `exportar_legacy.py`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+new file mode 100644
+--- /dev/null
++++ b/exportar_legacy.py
+@@ -0,0 +1,86 @@
++import subprocess
++import os
++
++# CONFIGURACIÓN:
++# ---------------------------------------------------------
++OUTPUT_FILE = "historial_completo_proyecto.md"
++DIAS_ATRAS = 3650  # 10 años -> Básicamente todo el historial
++# Extensiones a ignorar (Archivos que no aportan lógica de negocio)
++EXCLUDE_EXTENSIONS = [
++    '.json', '.lock', '.png', '.jpg', '.svg', '.map', 
++    '.csv', '.txt', '.md', '.pyc', '.gitignore'
++]
++# ---------------------------------------------------------
++
++def run_git_command(command):
++    try:
++        # encoding='utf-8' y errors='ignore' son clave para no romper con tildes o emojis
++        result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
++        return result.decode('utf-8', errors='ignore').strip()
++    except subprocess.CalledProcessError as e:
++        return ""
++
++def generate_markdown():
++    print(f"--- Iniciando extracción de historial ({DIAS_ATRAS} días) ---")
++    
++    # Obtener hashes desde hace X días hasta hoy
++    cmd_hashes = f'git log --since="{DIAS_ATRAS} days ago" --format="%H" --reverse' # --reverse para cronología real
++    hashes = run_git_command(cmd_hashes).split('\n')
++    
++    if not hashes or hashes == ['']:
++        print("No se encontraron commits. ¿Tienes git iniciado en esta carpeta?")
++        return
++
++    total = len(hashes)
++    print(f"Se encontraron {total} commits para procesar.")
++
++    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
++        f.write(f"# Documentación Viva del Proyecto (Basada en Git Log)\n")
++        f.write(f"> Generado automáticamente para análisis de IA.\n\n")
++
++        for i, commit_hash in enumerate(hashes):
++            # Barra de progreso simple en consola
++            if i % 10 == 0: print(f"Procesando commit {i+1}/{total}...")
++
++            # Metadatos
++            info = run_git_command(f'git show -s --format="## Commit: %h%n**Fecha:** %ad%n**Mensaje:** %s" {commit_hash}')
++            f.write(info + "\n\n")
++            
++            # Archivos modificados en este commit
++            files_changed = run_git_command(f'git show --name-only --format="" {commit_hash}').split('\n')
++            
++            for file_path in files_changed:
++                if not file_path: continue
++                
++                # Filtro de extensiones
++                _, ext = os.path.splitext(file_path)
++                if ext in EXCLUDE_EXTENSIONS:
++                    continue
++                
++                # Obtener el diff limpio
++                diff = run_git_command(f'git show {commit_hash} -- "{file_path}"')
++                
++                # Limpieza de ruido del diff header
++                lines = diff.split('\n')
++                clean_diff = []
++                for line in lines:
++                    if line.startswith('index ') or line.startswith('diff --git'):
++                        continue
++                    clean_diff.append(line)
++                
++                diff_text = "\n".join(clean_diff)
++
++                if diff_text:
++                    f.write(f"#### 📄 `{file_path}`\n")
++                    f.write("```python\n") # Forzamos python por defecto para coloreado genérico
++                    f.write(diff_text[:4000]) # Límite por archivo para no explotar
++                    if len(diff_text) > 4000:
++                        f.write("\n... (truncado) ...")
++                    f.write("\n```\n\n")
++            
++            f.write("---\n")
++
++    print(f"✅ ¡Éxito! Archivo generado: {OUTPUT_FILE}")
++
++if __name__ == "__main__":
++    generate_markdown()
+\ No newline at end of file
+```
+
+#### 📄 `frontend/src/app/app.css`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/frontend/src/app/app.css
++++ b/frontend/src/app/app.css
+@@ -27,6 +27,54 @@
+   min-height: 0;
+ }
+ 
++.loading-overlay {
++  position: absolute;
++  inset: 0;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  background: rgba(249, 250, 251, 0.7);
++  backdrop-filter: blur(2px);
++  z-index: 50;
++  transition: opacity 0.2s ease-in-out;
++}
++
++.loading-content {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  color: #111827;
++  font-weight: 600;
++}
++
++.spinner {
++  width: 28px;
++  height: 28px;
++  border-radius: 50%;
++  border: 3px solid rgba(17, 24, 39, 0.15);
++  border-top-color: #111827;
++  animation: spin 0.9s linear infinite;
++}
++
++.loading-text {
++  font-size: 14px;
++}
++
++@keyframes spin {
++  to {
++    transform: rotate(360deg);
++  }
++}
++
++@media (prefers-reduced-motion: reduce) {
++  .spinner {
++    animation: none;
++  }
++  .loading-overlay {
++    transition: none;
++  }
++}
++
+ /* Asegurar que el sidebar esté siempre visible en desktop */
+ @media (min-width: 768px) {
+   .main-with-sidebar {
+```
+
+#### 📄 `frontend/src/app/app.routes.server.ts`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/frontend/src/app/app.routes.server.ts
++++ b/frontend/src/app/app.routes.server.ts
+@@ -1,6 +1,14 @@
+ import { RenderMode, ServerRoute } from '@angular/ssr';
+ 
+ export const serverRoutes: ServerRoute[] = [
++  {
++    path: 'consorcios/nuevo',
++    renderMode: RenderMode.Server
++  },
++  {
++    path: 'consorcios/:consortiumId/editar',
++    renderMode: RenderMode.Server
++  },
+   {
+     path: 'dashboard/:consortiumName',
+     renderMode: RenderMode.Server
+@@ -47,10 +55,10 @@ export const serverRoutes: ServerRoute[] = [
+   },
+   {
+     path: '',
+-    renderMode: RenderMode.Prerender
++    renderMode: RenderMode.Server
+   },
+   {
+     path: '**',
+-    renderMode: RenderMode.Prerender
++    renderMode: RenderMode.Server
+   }
+ ];
+```
+
+#### 📄 `frontend/src/app/app.ts`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/frontend/src/app/app.ts
++++ b/frontend/src/app/app.ts
+@@ -1,5 +1,5 @@
+ import { Component, signal, OnInit, HostListener } from '@angular/core';
+-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
++import { RouterOutlet, Router, NavigationEnd, NavigationStart, NavigationCancel, NavigationError } from '@angular/router';
+ import { filter } from 'rxjs/operators';
+ import { IconComponent } from './components/atoms/icon.component/icon.component';
+ import { GenericButtonComponent } from './components/atoms/generic-button.component/generic-button.component';
+@@ -23,6 +23,13 @@ import { FooterComponent } from './components/organism/footer.component/footer.c
+         <main [class]="showSidebar ? 'main-with-sidebar' : 'main-no-sidebar'">
+            <router-outlet></router-outlet>
+         </main>
++
++        <div class="loading-overlay" *ngIf="isLoading">
++          <div class="loading-content">
++            <div class="spinner" aria-label="Cargando" role="status"></div>
++            <span class="loading-text">Cargando...</span>
++          </div>
++        </div>
+       </div>
+       <app-footer></app-footer>
+     </div>
+@@ -35,10 +42,26 @@ export class App implements OnInit {
+   protected readonly title = signal('frontend');
+   isSidebarOpen = false;
+   showSidebar = false; // Controla si se muestra el sidebar (no en la página de selección)
++  isLoading = true;
++  private pendingNavigation = 0;
+ 
+   constructor(private router: Router) {}
+ 
+   ngOnInit() {
++    this.router.events.subscribe(event => {
++      if (event instanceof NavigationStart) {
++        this.pendingNavigation += 1;
++        this.isLoading = true;
++      }
++
++      if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
++        this.pendingNavigation = Math.max(0, this.pendingNavigation - 1);
++        if (this.pendingNavigation === 0) {
++          this.isLoading = false;
++        }
++      }
++    });
++
+     // Detectar cambios de ruta
+     this.router.events
+       .pipe(filter(event => event instanceof NavigationEnd))
+```
+
+#### 📄 `frontend/src/app/components/organism/consortium-grid.component/consortium-grid.component.ts`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/frontend/src/app/components/organism/consortium-grid.component/consortium-grid.component.ts
++++ b/frontend/src/app/components/organism/consortium-grid.component/consortium-grid.component.ts
+@@ -100,7 +100,8 @@ export class ConsortiumGridComponent {
+         this.consortiumCreated.emit();
+       },
+       error: (error: any) => {
+-        alert('Error al crear consorcio.');
++        const message = this.getErrorMessage(error, 'Error al crear consorcio.');
++        alert(message);
+         console.error('Error al crear consorcio:', error);
+       }
+     });
+@@ -140,9 +141,22 @@ export class ConsortiumGridComponent {
+         this.consortiumDeleted.emit();
+       },
+       error: (error: any) => {
+-        alert('Error al eliminar consorcio.');
++        const message = this.getErrorMessage(error, 'Error al eliminar consorcio.');
++        alert(message);
+         console.error('Error al eliminar consorcio:', error);
+       }
+     });
+   }
++
++  private getErrorMessage(error: any, fallback: string): string {
++    const apiMessage = error?.error?.message || error?.message;
++    const apiErrors = error?.error?.errors;
++    if (apiErrors && typeof apiErrors === 'object') {
++      const details = Object.entries(apiErrors)
++        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : String(messages)}`)
++        .join(' | ');
++      return `${apiMessage || fallback} (${details})`;
++    }
++    return apiMessage || fallback;
++  }
+ }
+```
+
+#### 📄 `frontend/src/app/components/pages/consortium-form/consortium-form.ts`
+```python
+commit 815a4f33a206e4be36576a38106ad6276c772675
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Fri Feb 6 21:36:31 2026 -0300
+
+    agrego documentacion legacy
+
+--- a/frontend/src/app/components/pages/consortium-form/consortium-form.ts
++++ b/frontend/src/app/components/pages/consortium-form/consortium-form.ts
+@@ -86,7 +86,8 @@ export class ConsortiumForm implements OnInit {
+     this.consortiumService.createConsortium(formValue).subscribe({
+       next: () => this.router.navigate(['/']),
+       error: (error: any) => {
+-        alert('Error al crear consorcio.');
++        const message = this.getErrorMessage(error, 'Error al crear consorcio.');
++        alert(message);
+         console.error('Error al crear consorcio:', error);
+       }
+     });
+@@ -95,4 +96,16 @@ export class ConsortiumForm implements OnInit {
+   onCancel(): void {
+     this.router.navigate(['/']);
+   }
++
++  private getErrorMessage(error: any, fallback: string): string {
++    const apiMessage = error?.error?.message || error?.message;
++    const apiErrors = error?.error?.errors;
++    if (apiErrors && typeof apiErrors === 'object') {
++      const details = Object.entries(apiErrors)
++        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : String(messages)}`)
++        .join(' | ');
++      return `${apiMessage || fallback} (${details})`;
++    }
++    return apiMessage || fallback;
++  }
+ }
+```
+
+---
+## Commit: 524d387
+**Fecha:** Mon Feb 9 23:29:34 2026 -0300
+**Mensaje:** se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+#### 📄 `.gitignore`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+new file mode 100644
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,3 @@
++# Google Cloud Credentials
++backend/backend_core/our-ratio-483700-u2-c0488bd269ae.json
++
+```
+
+#### 📄 `Dockerfile`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -28,6 +28,7 @@ ENV PYTHONUNBUFFERED 1
+ RUN apt-get update && apt-get install -y \
+     gcc \
+     libpq-dev \
++    poppler-utils \
+     && rm -rf /var/lib/apt/lists/*
+ 
+ # Instalar dependencias de Python
+```
+
+#### 📄 `backend/backend_core/settings.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/backend/backend_core/settings.py
++++ b/backend/backend_core/settings.py
+@@ -154,3 +154,5 @@ STATICFILES_DIRS = [
+ 
+ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ 
++os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(BASE_DIR / "backend_core" / "our-ratio-483700-u2-c0488bd269ae.json")
++
+```
+
+#### 📄 `backend/gastos/tests/integration/facturas test/20260205_E_83668593-9127001587556.pdf`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+new file mode 100644
+Binary files /dev/null and b/backend/gastos/tests/integration/facturas test/20260205_E_83668593-9127001587556.pdf differ
+```
+
+#### 📄 `backend/gastos/tests/integration/test_04_integration_gasto_extraer_archivo.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+new file mode 100644
+--- /dev/null
++++ b/backend/gastos/tests/integration/test_04_integration_gasto_extraer_archivo.py
+@@ -0,0 +1,37 @@
++from unittest.mock import patch
++
++from django.core.files.uploadedfile import SimpleUploadedFile
++from django.test import TestCase
++
++
++class TestGastoExtraerArchivoIntegration(TestCase):
++    @patch("gastos.views.process_file")
++    def test_01_extraer_gasto_desde_archivo_ok(self, mock_process_file):
++        mock_process_file.return_value = {
++            "raw_text": "Factura ejemplo",
++            "fecha": "01/01/2026",
++            "numero_factura": "A-0001-00000001",
++            "importe_total": "1500,00",
++            "cuit_proveedor": "30-12345678-9",
++            "periodo_facturado": "01/2026",
++            "descripcion": "Servicio mensual",
++            "fecha_vencimiento": "10/01/2026",
++        }
++
++        archivo = SimpleUploadedFile(
++            "factura.png",
++            b"fake-image-content",
++            content_type="image/png",
++        )
++
++        response = self.client.post(
++            "/api/gastos/extraer-desde-archivo/",
++            data={"archivo": archivo},
++        )
++
++        self.assertEqual(response.status_code, 200)
++        body = response.json()
++        self.assertEqual(body["status"], "success")
++        self.assertEqual(body["data"]["cuit_proveedor"], "30-12345678-9")
++        self.assertEqual(body["data"]["periodo"], "01/2026")
++        self.assertEqual(body["data"]["monto"], "1500,00")
+```
+
+#### 📄 `backend/gastos/tests/integration/test_05_integration_gasto_extraer_archivo_real.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+new file mode 100644
+--- /dev/null
++++ b/backend/gastos/tests/integration/test_05_integration_gasto_extraer_archivo_real.py
+@@ -0,0 +1,47 @@
++import os
++
++from django.conf import settings
++from django.core.files.uploadedfile import SimpleUploadedFile
++from django.test import TestCase
++
++
++class TestGastoExtraerArchivoRealIntegration(TestCase):
++    def test_01_extraer_gasto_desde_archivo_real(self):
++        factura_path = os.path.join(
++            settings.BASE_DIR,
++            "gastos",
++            "tests",
++            "integration",
++            "facturas test",
++            "20260205_E_83668593-9127001587556.pdf",
++        )
++        self.assertTrue(os.path.exists(factura_path))
++
++        with open(factura_path, "rb") as factura_file:
++            archivo = SimpleUploadedFile(
++                "20260205_E_83668593-9127001587556.pdf",
++                factura_file.read(),
++                content_type="application/pdf",
++            )
++
++        response = self.client.post(
++            "/api/gastos/extraer-desde-archivo/",
++            data={"archivo": archivo},
++        )
++
++        if response.status_code != 200:
++            try:
++                payload = response.json()
++            except ValueError:
++                payload = response.content.decode("utf-8", errors="replace")
++            self.fail(f"Respuesta {response.status_code}: {payload}")
++
++        self.assertEqual(response.status_code, 200)
++        body = response.json()
++        self.assertEqual(body.get("status"), "success")
++        data = body.get("data") or {}
++        self.assertIn("cuit_proveedor", data)
++        self.assertIn("periodo", data)
++        self.assertIn("descripcion", data)
++        self.assertIn("monto", data)
++        self.assertIn("raw_text", data)
+```
+
+#### 📄 `backend/gastos/urls.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/backend/gastos/urls.py
++++ b/backend/gastos/urls.py
+@@ -7,6 +7,8 @@ from . import views
+ urlpatterns = [
+     path("", views.listar_gastos, name="listar_gastos"),
+     path("crear/", views.crear_gasto, name="crear_gasto"),
++    path("cargar-desde-archivo/", views.cargar_gasto_desde_archivo, name="cargar_gasto_desde_archivo"),
++    path("extraer-desde-archivo/", views.extraer_gasto_desde_archivo, name="extraer_gasto_desde_archivo"),
+     path("consorcio/<str:cuit_consorcio>/", views.listar_gastos_por_consorcio, name="listar_gastos_por_consorcio"),
+     path("proveedor/<str:cuit_proveedor>/", views.listar_gastos_por_proveedor, name="listar_gastos_por_proveedor"),
+     path("tipo/<str:tipo_gasto>/", views.listar_gastos_por_tipo, name="listar_gastos_por_tipo"),
+```
+
+#### 📄 `backend/gastos/views.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/backend/gastos/views.py
++++ b/backend/gastos/views.py
+@@ -4,6 +4,9 @@ Fecha:
+     31 - 01 - 2026
+ """
+ 
++from datetime import datetime
++from decimal import Decimal, InvalidOperation
++
+ from django.core.exceptions import ValidationError
+ from django.http import JsonResponse
+ from django.views.decorators.http import require_http_methods
+@@ -11,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
+ import json
+ 
+ from .services import GastoService
++from shared.utils import process_file
+ 
+ 
+ @csrf_exempt
+@@ -258,6 +262,147 @@ def actualizar_gasto(request, id_gasto):
+         }, status=404)
+ 
+ 
++@csrf_exempt
++@require_http_methods(["POST"])
++def cargar_gasto_desde_archivo(request):
++    """Carga un gasto desde un archivo (pdf o imagen) y extrae datos relevantes.
++
++    POST (multipart/form-data):
++        archivo: archivo PDF o imagen
++        consorcio: string (cuit) [requerido]
++        proveedor: string (cuit) [opcional si viene en el archivo]
++        periodo: date (YYYY-MM-DD) [opcional si se detecta del archivo]
++        descripcion: string [opcional]
++        monto: decimal [opcional si se detecta del archivo]
++        tipo_gasto: string [opcional]
++        estado_pago: string [opcional]
++    """
++    try:
++        archivo = request.FILES.get("archivo")
++        if not archivo:
++            return JsonResponse({
++                "status": "error",
++                "message": "No se proporcionó ningún archivo.",
++            }, status=400)
++
++        extraidos = process_file(archivo)
++
++        consorcio = request.POST.get("consorcio")
++        proveedor = request.POST.get("proveedor") or extraidos.get("cuit_proveedor")
++        periodo = request.POST.get("periodo") or extraidos.get("periodo_facturado") or extraidos.get("fecha")
++        descripcion = request.POST.get("descripcion") or extraidos.get("descripcion")
++        monto = request.POST.get("monto") or extraidos.get("importe_total")
++        tipo_gasto = request.POST.get("tipo_gasto")
++        estado_pago = request.POST.get("estado_pago")
++
++        if not consorcio:
++            return JsonResponse({
++                "status": "error",
++                "message": "El campo consorcio es obligatorio.",
++            }, status=400)
++        if not proveedor:
++            return JsonResponse({
++                "status": "error",
++                "message": "No se pudo determinar el proveedor.",
++            }, status=400)
++        if not monto:
++            return JsonResponse({
++                "status": "error",
++                "message": "No se pudo determinar el monto.",
++            }, status=400)
++        if not periodo:
++            return JsonResponse({
++                "status": "error",
++                "message": "No se pudo determinar el periodo.",
++            }, status=400)
++
++        try:
++            monto_normalizado = str(monto).replace(".", "").replace(",", ".")
++            monto_decimal = Decimal(monto_normalizado)
++        except (InvalidOperation, AttributeError):
++            return JsonResponse({
++                "status": "error",
++                "message": "El monto no es válido.",
++            }, status=400)
++
++        try:
++            if isinstance(periodo, str) and "/" in periodo and len(periodo) == 7:
++                periodo_fecha = datetime.strptime(periodo, "%m/%Y").date().replace(day=1)
++            elif isinstance(periodo, str) and "/" in periodo and len(periodo) == 10:
++                periodo_fecha = datetime.strptime(periodo, "%d/%m/%Y").date()
++            else:
++                periodo_fecha = datetime.strptime(periodo, "%Y-%m-%d").date()
++        except (ValueError, TypeError):
++            return JsonResponse({
++                "status": "error",
++                "message": "E
+... (truncado) ...
+```
+
+#### 📄 `backend/pagos/views.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/backend/pagos/views.py
++++ b/backend/pagos/views.py
+@@ -232,4 +232,4 @@ def eliminar_pago(request, id_pago):
+         return JsonResponse({
+             "status": "error",
+             "message": str(e),
+-        }, status=404)
++        }, status=404)
+\ No newline at end of file
+```
+
+#### 📄 `backend/shared/utils.py`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/backend/shared/utils.py
++++ b/backend/shared/utils.py
+@@ -7,12 +7,14 @@ Fecha:
+ from __future__ import annotations
+ 
+ from decimal import Decimal
++import io
+ import re
+ from typing import Iterable, Tuple
+ 
+ from django.core.exceptions import ValidationError
+ from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+-
++from pdf2image import convert_from_bytes
++from google.cloud import vision
+ from .constants import ERROR_PREFIX, MASK_CHAR, MASK_EMPTY_VALUE
+ 
+ 
+@@ -253,3 +255,92 @@ def build_model_str(model_name: str, fields: Iterable[Tuple[str, object, bool]])
+ 
+     parts = [format_field(name, value, mask) for name, value, mask in fields]
+     return f"{model_name}({', '.join(parts)})"
++
++def extract_text_from_img_by_vision(image_content: bytes) -> str:
++    """Extrae texto de una imagen utilizando vision cloud ai de google cloud.
++
++    Args:
++        image_path (str): Ruta a la imagen.
++
++    Returns:
++        str: Texto extraído de la imagen.
++    """
++    client = vision.ImageAnnotatorClient()
++    image = vision.Image(content=image_content)
++    response = client.text_detection(image=image)
++
++    if response.error.message:
++        raise Exception(f"Error al procesar la imagen: {response.error.message}")
++    if response.text_annotations:
++        return response.text_annotations[0].description
++    return ""
++
++
++def parse_invoice_data(text: str) -> dict:
++    """Parsea datos de una factura desde el texto extraído.
++
++    Args:
++        text (str): Texto extraído de la imagen.
++
++    Returns:
++        dict: Datos parseados de la factura.
++    """
++    data = {
++        "raw_text": text,
++        "fecha": None,
++        "numero_factura": None,
++        "importe_total": None,
++        "cuit_proveedor": None,
++        "periodo_facturado": None,
++        "descripcion": None,
++        "fecha_vencimiento": None,
++    }
++
++    fecha_match = re.search(r"Fecha[:\s]+(\d{2}/\d{2}/\d{4})", text, re.IGNORECASE)
++    importe_match = re.search(r"(Total|Importe)[:\s]+\$?([\d.,]+)", text, re.IGNORECASE)
++    cuit_match = re.search(r"CUIT[:\s]+(\d{2}-\d{8}-\d)", text, re.IGNORECASE)
++    numero_factura_match = re.search(r"N(ro|ro\.|úmero|º)[:\s]+([\w-]+)", text, re.IGNORECASE)
++    periodo_match = re.search(r"Periodo[:\s]+(\d{2}/\d{4})", text, re.IGNORECASE)
++    fecha_vencimiento_match = re.search(r"Vencimiento[:\s]+(\d{2}/\d{2}/\d{4})", text, re.IGNORECASE)
++
++    if fecha_match:
++        data["fecha"] = fecha_match.group(1)
++    if importe_match:
++        data["importe_total"] = importe_match.group(2)
++    if cuit_match:
++        data["cuit_proveedor"] = cuit_match.group(1)
++    if numero_factura_match:
++        data["numero_factura"] = numero_factura_match.group(2)
++    if periodo_match:
++        data["periodo_facturado"] = periodo_match.group(1)
++    if fecha_vencimiento_match:
++        data["fecha_vencimiento"] = fecha_vencimiento_match.group(1)
++
++    return data
++
++def process_file(file_obj) -> dict:
++    """Procesa un pdf o imagen y orquesta la estrategia de extracción de datos.
++
++    Args:
++        file_obj: Archivo a procesar.
++
++    Returns:
++        str: Contenido del archivo como texto.
++    """
++    file_bytes = file_obj.read()
++    content_type = (file_obj.content_type or "").lower()
++   
++    full_text = ""
++    if "pdf" in content_type:
++        images = convert_from_bytes(file_bytes)
++        if images:
++            for image in images:
++                image_buffer = io.BytesIO()
++                image.save(image_buffer, format="JPEG")
++                image_bytes = image_buffer.getvalue()
++                full_text += extract_text_from_img_by_vision(image_bytes) + "\n"
++    else:
++        full_text = extract_text_from_img_by_vision(file_bytes)
++
+... (truncado) ...
+```
+
+#### 📄 `docker-compose.yml`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -27,6 +27,9 @@ services:
+       - DB_PORT=5432
+       - DJANGO_SECRET_KEY=B0k4v4S4l1rc@mp30n
+       - DJANGO_DEBUG=True
++      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/vision.json
++    volumes:
++      - ./backend/backend_core/our-ratio-483700-u2-c0488bd269ae.json:/app/credentials/vision.json:ro
+     command: gunicorn --bind 0.0.0.0:8000 backend_core.wsgi:application
+ 
+ volumes:
+```
+
+#### 📄 `frontend/src/app/components/pages/expense-upload/expense-upload.css`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/frontend/src/app/components/pages/expense-upload/expense-upload.css
++++ b/frontend/src/app/components/pages/expense-upload/expense-upload.css
+@@ -32,6 +32,32 @@
+   gap: 16px;
+ }
+ 
++.loading-indicator {
++  display: inline-flex;
++  align-items: center;
++  gap: 10px;
++  padding: 10px 12px;
++  background-color: #F3F4F6;
++  color: #374151;
++  border-radius: 8px;
++  font-size: 14px;
++}
++
++.spinner {
++  width: 16px;
++  height: 16px;
++  border-radius: 50%;
++  border: 2px solid #D1D5DB;
++  border-top-color: #2563EB;
++  animation: spin 0.9s linear infinite;
++}
++
++@keyframes spin {
++  to {
++    transform: rotate(360deg);
++  }
++}
++
+ .form-actions {
+   display: flex;
+   justify-content: flex-end;
+```
+
+#### 📄 `frontend/src/app/components/pages/expense-upload/expense-upload.html`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/frontend/src/app/components/pages/expense-upload/expense-upload.html
++++ b/frontend/src/app/components/pages/expense-upload/expense-upload.html
+@@ -9,6 +9,10 @@
+   <div class="upload-container">
+     <div class="upload-section">
+       <app-label text="Subir Recibo (Opcional)" fontSize="20px" color="#1F2937"></app-label>
++      <div *ngIf="isExtracting" class="loading-indicator">
++        <span class="spinner"></span>
++        <span>Procesando recibo...</span>
++      </div>
+       <div *ngIf="!selectedFile">
+         <app-drop-zone
+           (fileDropped)="onFileDropped($event)"
+@@ -30,7 +34,7 @@
+         <button class="cancel-button" (click)="onCancel()">
+           Cancelar
+         </button>
+-        <button class="submit-button" (click)="onSubmit()" [disabled]="expenseForm.invalid">
++        <button class="submit-button" (click)="onSubmit()" [disabled]="expenseForm.invalid || isExtracting">
+           Guardar Gasto
+         </button>
+       </div>
+```
+
+#### 📄 `frontend/src/app/components/pages/expense-upload/expense-upload.ts`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/frontend/src/app/components/pages/expense-upload/expense-upload.ts
++++ b/frontend/src/app/components/pages/expense-upload/expense-upload.ts
+@@ -9,6 +9,7 @@ import { FilePreview } from '../../molecules/file-preview/file-preview';
+ import { ExpenseForm } from '../../organism/expense-form/expense-form';
+ import { LabelComponent } from '../../atoms/label.component/label.component';
+ import { ConsortiumService } from '../../../services/consortium.service';
++import { finalize } from 'rxjs';
+ 
+ @Component({
+   selector: 'app-expense-upload',
+@@ -32,6 +33,7 @@ export class ExpenseUpload implements OnInit {
+   consortiumId: string = '';
+   isEditMode = false;
+   expenseId: number | null = null;
++  isExtracting = false;
+ 
+   constructor(
+     private fb: FormBuilder,
+@@ -113,7 +115,20 @@ export class ExpenseUpload implements OnInit {
+     }
+     this.selectedFile = file;
+     this.fileName = file.name;
+-    // Por ahora no procesamos con OCR, solo guardamos la referencia del archivo
++    this.isExtracting = true;
++    this.spendsService.extractSpendFromFile(file)
++      .pipe(finalize(() => {
++        this.isExtracting = false;
++      }))
++      .subscribe({
++        next: (response) => {
++          const data = response?.data || {};
++          this.applyExtractedData(data);
++        },
++        error: (error) => {
++          console.error('Error al extraer datos del archivo:', error);
++        }
++      });
+   }
+ 
+   onFileRemove() {
+@@ -147,6 +162,18 @@ export class ExpenseUpload implements OnInit {
+         return;
+       }
+ 
++      if (this.selectedFile) {
++        this.spendsService.addSpendFromFile(payload, this.selectedFile).subscribe({
++          next: () => {
++            this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
++          },
++          error: (error: any) => {
++            console.error('Error al cargar gasto desde archivo:', error);
++          }
++        });
++        return;
++      }
++
+       this.spendsService.addSpend(payload).subscribe({
+         next: () => {
+           this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
+@@ -166,4 +193,55 @@ export class ExpenseUpload implements OnInit {
+   onCancel() {
+     this.router.navigate(['/dashboard', this.consortiumName, 'gastos']);
+   }
++
++  private applyExtractedData(data: any) {
++    const patch: any = {};
++
++    if (data.cuit_proveedor) {
++      patch.cuitProveedor = String(data.cuit_proveedor);
++    }
++
++    if (data.descripcion) {
++      patch.descripcion = String(data.descripcion);
++    }
++
++    if (data.monto) {
++      const montoStr = String(data.monto).replace(/\./g, '').replace(',', '.');
++      const montoValue = Number(montoStr);
++      if (!Number.isNaN(montoValue)) {
++        patch.monto = montoValue;
++      }
++    }
++
++    if (data.periodo) {
++      const periodoValue = this.normalizePeriodo(String(data.periodo));
++      if (periodoValue) {
++        patch.periodo = periodoValue;
++      }
++    }
++
++    this.expenseForm.patchValue(patch);
++  }
++
++  private normalizePeriodo(periodo: string): string | null {
++    if (!periodo) {
++      return null;
++    }
++
++    if (/^\d{4}-\d{2}-\d{2}$/.test(periodo)) {
++      return periodo;
++    }
++
++    if (/^\d{2}\/\d{4}$/.test(periodo)) {
++      const [month, year] = periodo.split('/');
++      return `${year}-${month}-01`;
++    }
++
++    if (/^\d{2}\/\d{2}\/\d{4}$/.test(periodo)) {
++      const [day, month, year] = periodo.split('/');
++      return `${year}-${month}-${day}`;
++    }
++
++    return null;
++  }
+ }
+\ No newline at end of file
+```
+
+#### 📄 `frontend/src/app/services/spends.services.ts`
+```python
+commit 524d387f865b62b0afce1372a03f136eb50a7ee3
+Author: Valentino <vceniceros2001@gmail.com>
+Date:   Mon Feb 9 23:29:34 2026 -0300
+
+    se logra una funcionalidad parcial al modulo de cargar gastos mediante vision de google cloud services
+
+--- a/frontend/src/app/services/spends.services.ts
++++ b/frontend/src/app/services/spends.services.ts
+@@ -33,6 +33,23 @@ export class SpendsService {
+     return this.http.post(`${this.apiUrl}crear/`, payload);
+   }
+ 
++  addSpendFromFile(payload: any, file: File): Observable<any> {
++    const formData = new FormData();
++    formData.append('archivo', file);
++    Object.entries(payload || {}).forEach(([key, value]) => {
++      if (value !== undefined && value !== null && value !== '') {
++        formData.append(key, String(value));
++      }
++    });
++    return this.http.post(`${this.apiUrl}cargar-desde-archivo/`, formData);
++  }
++
++  extractSpendFromFile(file: File): Observable<any> {
++    const formData = new FormData();
++    formData.append('archivo', file);
++    return this.http.post(`${this.apiUrl}extraer-desde-archivo/`, formData);
++  }
++
+   updateSpendStatus(spend: Spend, newStatus: EstadoPago): Observable<any> {
+     return this.http.put(`${this.apiUrl}${spend.idGasto}/actualizar/`, {
+       estado_pago: newStatus
+```
+
+---
