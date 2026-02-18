@@ -4,7 +4,7 @@ import os
 # CONFIGURACIÓN:
 # ---------------------------------------------------------
 OUTPUT_FILE = "historial_completo_proyecto.md"
-DIAS_ATRAS = 3650  # 10 años -> Básicamente todo el historial
+DIAS_ATRAS = 7 # 10 años -> Básicamente todo el historial
 # Extensiones a ignorar (Archivos que no aportan lógica de negocio)
 EXCLUDE_EXTENSIONS = [
     '.json', '.lock', '.png', '.jpg', '.svg', '.map', 
