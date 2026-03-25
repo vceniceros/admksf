@@ -4,3 +4,11 @@ backend/backend_core/our-ratio-483700-u2-c0488bd269ae.json
 __pycache__/
 *.pyc
 *.pyo
+*.sql
+*.key
+*_private
+*_public
+.env
+our-ratio-*.json
+settings_prod_backup.py
+docker-compose.yml.bak

@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: n8n-infra-postgres-1
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-infra-n8n-1
+    restart: always
+    ports:
+      - "127.0.0.1:5679:5678"
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE}
+      - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
+      - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${TZ}
+      - N8N_PROTOCOL=https
+      - N8N_HOST=n8n-haizaraf.duckdns.org
+      - WEBHOOK_URL=https://n8n-haizaraf.duckdns.org/
+      - N8N_PROXY_HOPS=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data/n8n:/home/node/.n8n
+
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: n8n-infra-duckdns-1
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+      - SUBDOMAINS=haizaraf,n8n-haizaraf
+      - TOKEN=${DUCKDNS_TOKEN}
+    restart: always
+
+  app-consorcio:
+    build:
+      context: ./app-consorcio
+      dockerfile: Dockerfile
+    container_name: n8n-infra-app-1
+    restart: always
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=haizaraf.duckdns.org,localhost,127.0.0.1
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
+      - DJANGO_SECRET_KEY=B0k4v4S4l1rc@mp30n
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?options=-csearch_path%3D%22consorcio360Bdd%22,consorcio360bdd,public
+    # Optimizamos el comando: ahora usa el requirements.txt que vimos en el ls
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 backend_core.wsgi:application -w 3"
+    volumes:
+      - ./app-consorcio/backend:/app
+      - static_volume:/app/staticfiles
+      - static_angular_volume:/app/static_angular
+      - templates_volume:/app/templates
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:9001:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/portainer:/data # Indentación corregida (Punto crítico Sentinel)
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    volumes:
+      - ./data/uptime-kuma:/app/data
+    ports:
+      - "127.0.0.1:4001:3001"
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:4002:8080"
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: n8n-infra-cloudbeaver
+    restart: always
+    ports:
+      - "127.0.0.1:4003:8978"
+    volumes:
+      - ./data/cloudbeaver:/opt/cloudbeaver/workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  default:
+    name: n8n_network
+
+volumes:
+  postgres_data:
+  static_volume:
+  static_angular_volume:
+  templates_volume:
