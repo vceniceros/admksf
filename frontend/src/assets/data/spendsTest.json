@@ -1,0 +1,90 @@
+[
+  {
+    "idGasto": 101,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30987654321",
+    "periodo": "2025-12-01",
+    "descripcion": "Reparación ascensor principal",
+    "monto": 15000.00,
+    "fechaRegistro": "2025-12-31T10:30:00",
+    "tipoGasto": "Mantenimiento",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 102,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30111111111",
+    "periodo": "2025-12-01",
+    "descripcion": "Luz común - Diciembre",
+    "monto": 8500.00,
+    "fechaRegistro": "2025-12-27T08:15:00",
+    "tipoGasto": "Servicios",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 103,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30222222222",
+    "periodo": "2025-12-01",
+    "descripcion": "Servicio de limpieza - Diciembre",
+    "monto": 12000.00,
+    "fechaRegistro": "2025-12-26T14:45:00",
+    "tipoGasto": "Limpieza",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 104,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30333333333",
+    "periodo": "2025-12-01",
+    "descripcion": "Gas común - Diciembre",
+    "monto": 6200.00,
+    "fechaRegistro": "2025-12-24T11:20:00",
+    "tipoGasto": "Servicios",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 105,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30444444444",
+    "periodo": "2025-12-01",
+    "descripcion": "Honorarios administrador - Diciembre",
+    "monto": 18000.00,
+    "fechaRegistro": "2025-12-19T09:00:00",
+    "tipoGasto": "Administracion",
+    "estadoPago": "Pendiente"
+  },
+  {
+    "idGasto": 106,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30555555555",
+    "periodo": "2025-12-01",
+    "descripcion": "Arreglo bomba de agua",
+    "monto": 9500.00,
+    "fechaRegistro": "2025-12-14T16:30:00",
+    "tipoGasto": "Mantenimiento",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 107,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30666666666",
+    "periodo": "2025-12-01",
+    "descripcion": "Vigilancia y seguridad - Diciembre",
+    "monto": 7500.00,
+    "fechaRegistro": "2025-12-20T13:10:00",
+    "tipoGasto": "Seguridad",
+    "estadoPago": "Pagado"
+  },
+  {
+    "idGasto": 108,
+    "cuitConsorcio": "30123456789",
+    "cuitProveedor": "30777777777",
+    "periodo": "2025-12-01",
+    "descripcion": "Reparación pintura acceso común",
+    "monto": 5000.00,
+    "fechaRegistro": "2025-12-18T10:00:00",
+    "tipoGasto": "Mantenimiento",
+    "estadoPago": "Pendiente"
+  }
+]

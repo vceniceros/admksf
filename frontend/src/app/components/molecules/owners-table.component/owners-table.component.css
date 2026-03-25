@@ -1,0 +1,85 @@
+.owners-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.owners-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: serif;
+}
+
+.owners-table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.owners-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  font-family: serif;
+}
+
+.owners-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.owners-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.owners-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.owners-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1f2937;
+  font-family: serif;
+}
+
+.dni {
+  font-weight: 600;
+  color: #111827;
+}
+
+.actions-column {
+  width: 120px;
+  text-align: right;
+}
+
+.icon-button {
+  border: none;
+  background: transparent;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: #f3f4f6;
+}
+
+.icon-button.danger:hover {
+  background-color: #fee2e2;
+}
+
+@media (max-width: 768px) {
+  .owners-table {
+    font-size: 12px;
+  }
+
+  .owners-table th,
+  .owners-table td {
+    padding: 8px 12px;
+  }
+}

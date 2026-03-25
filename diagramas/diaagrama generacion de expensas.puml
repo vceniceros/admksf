@@ -1,0 +1,23 @@
+@startuml
+
+title Diagrama de Generacion de Expensas
+
+Actor karina
+
+participant "frontend" as frontend
+participant "entryPoint" as entryPoint
+participant "backend" as backend
+participant "base de datos" as bd
+
+karina  ---> frontend :generarExpensa(barrio:String)
+
+frontend -> entryPoint : solicitarGeneracionExpensa(barrio:String):Request
+entryPoint -> backend : iniciarGeneracionExpensa(barrio:String):Request
+backend -> bd : obtenerBarrio(nombreBarrio:String):Barrio
+bd --> backend : devolverBarrio(barrio:Barrio):Response
+backend -> backend : generarGastos(barrio:Barrio):Gastos
+backend -> backend: calcularExpensas(gastos:Gastos):Expensas
+backend --> entryPoint : enviarExpensas(expensas:Expensas):Response
+entryPoint --> frontend :entregarExpensas(expensas:Expensas):Response
+frontend --> karina :mostrarExpensas(expensas:Expensas):Expensas
+@enduml

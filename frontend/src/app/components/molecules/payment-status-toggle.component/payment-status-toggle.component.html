@@ -1,0 +1,23 @@
+<div class="payment-status-toggle">
+  <button 
+    class="status-button"
+    [class.paid]="spend.estadoPago === EstadoPago.PAGADO"
+    [class.pending]="spend.estadoPago === EstadoPago.PENDIENTE"
+    (click)="onStatusClick()"
+    [title]="'Haz clic para ' + (spend.estadoPago === EstadoPago.PENDIENTE ? 'confirmar pago' : 'revertir pago')">
+    <span class="status-badge">
+      {{ spend.estadoPago }}
+    </span>
+  </button>
+
+  <app-alert 
+    [isOpen]="showAlert"
+    title="Cambio de Estado de Pago"
+    [message]="getAlertMessage()"
+    [confirmText]="getConfirmButtonText()"
+    cancelText="Cancelar"
+    [type]="AlertType.WARNING"
+    (confirm)="onConfirmStatusChange()"
+    (cancel)="onCancelStatusChange()">
+  </app-alert>
+</div>

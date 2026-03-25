@@ -1,0 +1,48 @@
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { Consortium } from '../../../../models/consortium.model';
+import { CardImageComponent } from '../../atoms/card-image.component/card-image.component';
+import { LabelComponent } from '../../atoms/label.component/label.component';
+import { StatusLabelComponent } from '../../atoms/status-label.component/status-label.component';
+import { InfoRowComponent } from '../info-row.component/info-row.component';
+import { IconComponent } from '../../atoms/icon.component/icon.component';
+
+@Component({
+  selector: 'app-consortium-card',
+  imports: [
+    CommonModule,
+    RouterModule,
+    CardImageComponent,
+    LabelComponent,
+    StatusLabelComponent,
+    InfoRowComponent,
+    IconComponent
+  ],
+  templateUrl: './consortium-card.component.html',
+  styleUrl: './consortium-card.component.css',
+  standalone: true
+})
+export class ConsortiumCardComponent {
+  @Input() consortium!: Consortium;
+  @Output() deleteConsortium = new EventEmitter<Consortium>();
+
+  constructor(private router: Router) {}
+
+  onCardClick() {
+    if (this.consortium.status === 'ACTIVE') {
+      const nameForUrl = this.consortium.name.toLowerCase().replace(/\s+/g, '-');
+      this.router.navigate(['/dashboard', nameForUrl]);
+    }
+  }
+
+  onDeleteClick(event: Event) {
+    event.stopPropagation();
+    this.deleteConsortium.emit(this.consortium);
+  }
+
+  onEditClick(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/consorcios', this.consortium.id, 'editar']);
+  }
+}

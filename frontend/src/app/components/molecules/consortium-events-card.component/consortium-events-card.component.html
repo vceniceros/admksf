@@ -1,0 +1,40 @@
+<div class="card events-card">
+  <div class="card-header">
+    <div class="header-left">
+      <app-icon iconHref="assets/img/sprites.svg#clipboard" size="20" color="#8B5CF6"></app-icon>
+      <app-label text="Carátula - Eventos del Último Mes" fontSize="18px" color="#1F2937" style="font-weight: 600;"></app-label>
+    </div>
+    <button class="add-event-btn" (click)="toggleForm()" [title]="showForm ? 'Cancelar' : 'Agregar evento'">
+      <app-icon [iconHref]="showForm ? 'assets/img/sprites.svg#x' : 'assets/img/sprites.svg#plus'" size="20" color="#8B5CF6"></app-icon>
+    </button>
+  </div>
+
+  <!-- Formulario de nuevo evento -->
+  <div class="event-form" *ngIf="showForm">
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Fecha</label>
+        <input type="date" [(ngModel)]="newEventDate" class="form-input" placeholder="Seleccionar fecha">
+      </div>
+      <div class="form-field" style="flex: 2;">
+        <label class="form-label">Descripción del evento</label>
+        <input type="text" [(ngModel)]="newEventDescription" class="form-input" placeholder="Ej: Se reemplazó la cerradura principal">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" (click)="toggleForm()">Cancelar</button>
+      <button class="btn-save" (click)="addEvent()" [disabled]="!newEventDate || !newEventDescription">Agregar</button>
+    </div>
+  </div>
+
+  <div class="events-list">
+    <div class="event-row" *ngFor="let event of events">
+      <div class="event-date">
+        <app-label [text]="event.date" fontSize="14px" color="#6B7280" style="font-weight: 600;"></app-label>
+      </div>
+      <div class="event-description">
+        <app-label [text]="event.description" fontSize="14px" color="#1F2937"></app-label>
+      </div>
+    </div>
+  </div>
+</div>

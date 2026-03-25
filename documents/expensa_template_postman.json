@@ -1,0 +1,70 @@
+{
+  "template": {
+    "nombre": "Template Base",
+    "version": 1,
+    "config": {
+      "rounding": {
+        "metodo": "step",
+        "increment": "0.50"
+      },
+      "columns": [
+        {
+          "id": "saldo_anterior",
+          "label": "Saldo Anterior",
+          "calc_type": "saldo_anterior",
+          "visible": true
+        },
+        {
+          "id": "interes_mora",
+          "label": "Interés Mora",
+          "calc_type": "interes",
+          "metodo": "simple",
+          "base": "saldo_anterior",
+          "tasa": "consorcio.interes_por_mora",
+          "visible": true
+        },
+        {
+          "id": "gastos_ordinarios_a",
+          "label": "Gastos Ordinarios A",
+          "calc_type": "prorrateo",
+          "gasto_tipo": "Mantenimiento",
+          "coeficiente": "superficie",
+          "visible": true
+        },
+        {
+          "id": "reparaciones",
+          "label": "Reparaciones",
+          "calc_type": "concepto_particular",
+          "visible": true
+        },
+        {
+          "id": "total",
+          "label": "Total",
+          "calc_type": "formula",
+          "expr": "saldo_anterior + interes_mora + gastos_ordinarios_a + reparaciones",
+          "apply_rounding": true,
+          "visible": true
+        }
+      ]
+    }
+  },
+  "liquidar_payload": {
+    "template_id": 1,
+    "consorcio": "20304050607",
+    "periodo": "2026-02",
+    "cerrar": true,
+    "parametros": {
+      "conceptos_particulares": [
+        {
+          "unidad": 1,
+          "column_id": "reparaciones",
+          "monto": "1200.00"
+        }
+      ],
+      "coeficientes_custom": {
+        "1": "0.60",
+        "2": "0.40"
+      }
+    }
+  }
+}

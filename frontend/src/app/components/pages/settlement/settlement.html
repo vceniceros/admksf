@@ -1,0 +1,386 @@
+<div class="mx-auto max-w-7xl p-6">
+      <div class="mt-4">
+    <h1 class="text-2xl font-semibold text-slate-800">Liquidación de Expensas</h1>
+    <p class="text-sm text-slate-500">Seleccioná el periodo y el template para previsualizar la liquidación.</p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-semibold text-slate-500">Periodo (Mes/Año)</label>
+
+      <p *ngIf="columnError" class="mt-3 text-xs font-semibold text-red-600">{{ columnError }}</p>
+      <input
+        type="month"
+        class="h-10 rounded-lg border border-slate-300 px-3 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+        [(ngModel)]="period"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-semibold text-slate-500">Template</label>
+      <select
+        class="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-700 focus:border-slate-400 focus:outline-none"
+        [(ngModel)]="selectedTemplateId"
+      >
+        <option value="">Seleccionar template</option>
+        <option *ngFor="let template of (templates$ | async)" [value]="template.id">
+          {{ template.nombre }} (v{{ template.version }})
+        </option>
+      </select>
+    </div>
+
+    <div class="flex items-end gap-3">
+      <button
+        class="h-10 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+        (click)="preview()"
+        [disabled]="isPreviewLoading || !selectedTemplateId"
+      >
+        {{ isPreviewLoading ? 'Procesando...' : 'Previsualizar' }}
+      </button>
+
+      <button
+        class="h-10 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:text-slate-400"
+        (click)="closeSettlement()"
+        [disabled]="isClosing || !selectedTemplateId"
+      >
+        {{ isClosing ? 'Cerrando...' : 'Cerrar Liquidación' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-slate-800">Templates de Expensa</h2>
+        <p class="text-xs text-slate-500">Creá, editá o eliminá templates del consorcio.</p>
+      </div>
+      <button
+        class="h-9 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white transition hover:bg-slate-800"
+        (click)="openTemplateForm()"
+      >
+        Nuevo Template
+      </button>
+    </div>
+
+    <div class="mt-4 overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="border-b border-slate-200 text-xs uppercase text-slate-500">
+          <tr>
+            <th class="px-3 py-2">Nombre</th>
+            <th class="px-3 py-2">Versión</th>
+            <th class="px-3 py-2">Activo</th>
+            <th class="px-3 py-2 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let template of templates">
+            <td class="px-3 py-2 text-slate-700">{{ template.nombre }}</td>
+            <td class="px-3 py-2 text-slate-700">v{{ template.version }}</td>
+            <td class="px-3 py-2">
+              <span
+                class="rounded-full px-2 py-1 text-xs"
+                [class.bg-emerald-100]="template.activo"
+                [class.text-emerald-700]="template.activo"
+                [class.bg-slate-100]="!template.activo"
+                [class.text-slate-600]="!template.activo"
+              >
+                {{ template.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="px-3 py-2 text-right">
+              <button
+                class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:border-slate-300"
+                (click)="openTemplateForm(template)"
+              >
+                Editar
+              </button>
+              <button
+                class="ml-2 rounded-md border border-red-200 px-2 py-1 text-xs text-red-600 hover:border-red-300"
+                (click)="deleteTemplate(template)"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="templates.length === 0">
+            <td colspan="4" class="px-3 py-4 text-center text-xs text-slate-400">
+              No hay templates cargados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-6" *ngIf="settlement$ | async as settlement">
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="border-b border-slate-200 px-4 py-3">
+        <p class="text-sm text-slate-600">
+          Periodo: <span class="font-semibold text-slate-800">{{ settlement.periodo }}</span>
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse text-left text-sm">
+          <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+            <tr>
+              <th class="sticky left-0 z-10 w-40 border-b border-slate-200 bg-slate-50 px-4 py-3">Unidad Funcional</th>
+              <th
+                *ngFor="let column of settlement.columns"
+                class="whitespace-nowrap border-b border-slate-200 px-4 py-3"
+              >
+                <div class="flex flex-col">
+                  <span class="text-xs font-semibold text-slate-600">{{ column.label }}</span>
+                  <span class="text-[11px] font-normal text-slate-400" *ngIf="column.help_text">{{ column.help_text }}</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let row of settlement.rows" class="hover:bg-slate-50">
+              <td class="sticky left-0 z-10 bg-white px-4 py-3 font-semibold text-slate-700">
+                UF {{ row.unidad_funcional }}
+              </td>
+              <td *ngFor="let column of settlement.columns" class="whitespace-nowrap px-4 py-3 text-slate-700">
+                {{ row[column.id] | settlementValue: column }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot class="bg-slate-50 text-slate-700">
+            <tr>
+              <td class="sticky left-0 z-10 border-t border-slate-200 bg-slate-50 px-4 py-3 font-semibold">
+                Totales
+              </td>
+              <td *ngFor="let column of settlement.columns" class="border-t border-slate-200 px-4 py-3">
+                {{ settlement.totales[column.id] | settlementValue: column }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fixed inset-0 z-40 bg-black/40" *ngIf="showDeleteConfirm" (click)="cancelDeleteTemplate()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4" *ngIf="showDeleteConfirm">
+  <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+    <h3 class="text-lg font-semibold text-slate-800">Eliminar Template</h3>
+    <p class="mt-2 text-sm text-slate-600">
+      ¿Seguro que querés eliminar el template
+      <span class="font-semibold text-slate-800">{{ templateToDelete?.nombre }}</span>?
+    </p>
+    <div class="mt-4" *ngIf="formError">
+      <p class="text-sm font-semibold text-red-600">{{ formError }}</p>
+    </div>
+
+    <div class="mt-6 flex items-center justify-end gap-3">
+      <button class="h-10 rounded-lg border border-slate-300 px-4 text-sm" (click)="cancelDeleteTemplate()">
+        Cancelar
+      </button>
+      <button class="h-10 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white" (click)="confirmDeleteTemplate()">
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="fixed inset-0 z-40 bg-black/40" *ngIf="showTemplateForm" (click)="closeTemplateForm()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4" *ngIf="showTemplateForm">
+  <div class="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-slate-800">
+        {{ isEditTemplate ? 'Editar Template' : 'Nuevo Template' }}
+      </h3>
+      <button class="text-slate-400 hover:text-slate-600" (click)="closeTemplateForm()">✕</button>
+    </div>
+
+    <div class="mt-4 flex-1 overflow-y-auto pr-1">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-semibold text-slate-500">Nombre</label>
+        <input
+          class="h-10 rounded-lg border border-slate-300 px-3 text-sm"
+          [(ngModel)]="templateForm.nombre"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-semibold text-slate-500">Versión</label>
+        <input
+          type="number"
+          class="h-10 rounded-lg border border-slate-300 px-3 text-sm"
+          [(ngModel)]="templateForm.version"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" [(ngModel)]="templateForm.activo" />
+        <label class="text-xs font-semibold text-slate-500">Activo</label>
+      </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Redondeo</label>
+          <select
+            class="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm"
+            [(ngModel)]="templateForm.roundingMetodo"
+          >
+            <option value="none">Sin redondeo</option>
+            <option value="step">Por incremento</option>
+            <option value="ceil">Redondeo hacia arriba</option>
+            <option value="floor">Redondeo hacia abajo</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Incremento</label>
+          <input
+            class="h-10 rounded-lg border border-slate-300 px-3 text-sm"
+            [(ngModel)]="templateForm.roundingIncrement"
+            [disabled]="templateForm.roundingMetodo !== 'step'"
+            placeholder="0.50"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-slate-200 p-4">
+        <h4 class="text-sm font-semibold text-slate-800">Columnas del Template</h4>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Etiqueta</label>
+          <input class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.label" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Tipo de cálculo</label>
+          <select class="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm" [(ngModel)]="columnDraft.calc_type">
+            <option value="">Seleccionar</option>
+            <option value="saldo_anterior">Saldo anterior</option>
+            <option value="interes">Interés</option>
+            <option value="prorrateo">Prorrateo</option>
+            <option value="concepto_particular">Concepto particular</option>
+            <option value="fijo">Monto fijo</option>
+            <option value="formula">Fórmula</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label class="text-xs font-semibold text-slate-500">Descripción</label>
+        <input
+          class="mt-2 h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
+          [(ngModel)]="columnDraft.help_text"
+          placeholder="Ej: Prorrateo de gastos de mantenimiento según superficie"
+        />
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="columnDraft.visible" />
+          <label class="text-xs font-semibold text-slate-500">Visible</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="columnDraft.apply_rounding" />
+          <label class="text-xs font-semibold text-slate-500">Aplicar redondeo</label>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3" *ngIf="columnDraft.calc_type === 'prorrateo'">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Tipo de gasto</label>
+          <input class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.gasto_tipo" placeholder="Mantenimiento" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Coeficiente</label>
+          <select class="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm" [(ngModel)]="columnDraft.coeficiente">
+            <option value="superficie">Superficie</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-4" *ngIf="columnDraft.calc_type === 'interes'">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Método</label>
+          <select class="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm" [(ngModel)]="columnDraft.metodo">
+            <option value="simple">Simple</option>
+            <option value="compuesto">Compuesto</option>
+            <option value="pronto_pago">Pronto pago</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Base</label>
+          <input class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.base" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Tasa</label>
+          <input class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.tasa" placeholder="consorcio.interes_por_mora" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Períodos</label>
+          <input type="number" class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.periodos" />
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" *ngIf="columnDraft.calc_type === 'fijo'">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-500">Valor</label>
+          <input class="h-10 rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.valor" />
+        </div>
+      </div>
+
+      <div class="mt-4" *ngIf="columnDraft.calc_type === 'formula'">
+        <label class="text-xs font-semibold text-slate-500">Fórmula</label>
+        <input class="mt-2 h-10 w-full rounded-lg border border-slate-300 px-3 text-sm" [(ngModel)]="columnDraft.expr" placeholder="saldo_anterior + interes + gastos" />
+      </div>
+
+      <div class="mt-4 flex items-center gap-3">
+        <button class="h-9 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white" (click)="addOrUpdateColumn()">
+          {{ editingColumnIndex !== null ? 'Actualizar' : 'Agregar' }}
+        </button>
+        <button class="h-9 rounded-lg border border-slate-300 px-3 text-xs" (click)="resetColumnForm()">
+          Limpiar
+        </button>
+      </div>
+
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-left text-xs">
+          <thead class="border-b border-slate-200 text-[11px] uppercase text-slate-500">
+            <tr>
+              <th class="px-2 py-2">ID</th>
+              <th class="px-2 py-2">Etiqueta</th>
+              <th class="px-2 py-2">Descripción</th>
+              <th class="px-2 py-2">Tipo</th>
+              <th class="px-2 py-2">Visible</th>
+              <th class="px-2 py-2 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let column of templateForm.columns; let i = index">
+              <td class="px-2 py-2 text-slate-700">{{ column.id }}</td>
+              <td class="px-2 py-2 text-slate-700">{{ column.label }}</td>
+              <td class="px-2 py-2 text-slate-500">{{ column.help_text || '-' }}</td>
+              <td class="px-2 py-2 text-slate-700">{{ column.calc_type }}</td>
+              <td class="px-2 py-2 text-slate-700">{{ column.visible ? 'Sí' : 'No' }}</td>
+              <td class="px-2 py-2 text-right">
+                <button class="rounded-md border border-slate-200 px-2 py-1" (click)="editColumn(i)">Editar</button>
+                <button class="ml-2 rounded-md border border-red-200 px-2 py-1 text-red-600" (click)="removeColumn(i)">Eliminar</button>
+              </td>
+            </tr>
+            <tr *ngIf="templateForm.columns.length === 0">
+              <td colspan="6" class="px-2 py-3 text-center text-slate-400">Sin columnas aún.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mt-6 flex items-center justify-end gap-3">
+      <button class="h-10 rounded-lg border border-slate-300 px-4 text-sm" (click)="closeTemplateForm()">
+        Cancelar
+      </button>
+      <button class="h-10 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white" (click)="saveTemplate()">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<div class="providers-page">
+  <div class="page-header">
+    <div>
+      <app-label text="Proveedores" fontSize="32px" color="#1F2937"></app-label>
+      <app-label text="Registro de proveedores" fontSize="16px" color="#6B7280"></app-label>
+    </div>
+    <button class="new-provider-btn" (click)="openCreateModal()">
+      <app-icon iconHref="assets/img/sprites.svg#plus" size="16" color="#FFFFFF"></app-icon>
+      <span>Nuevo Proveedor</span>
+    </button>
+  </div>
+
+  <div class="table-section">
+    <app-providers-table
+      [providers]="providers"
+      (editProvider)="openEditModal($event)"
+      (deleteProvider)="onDeleteProvider($event)">
+    </app-providers-table>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showFormModal" (click)="closeFormModal()"></div>
+<div class="modal" *ngIf="showFormModal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <app-label [text]="isEditMode ? 'Editar proveedor' : 'Nuevo proveedor'" fontSize="22px" color="#1F2937"></app-label>
+    <button class="icon-button" title="Cerrar" (click)="closeFormModal()">
+      <app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+    </button>
+  </div>
+  <form class="modal-form" [formGroup]="form" (ngSubmit)="submitForm()">
+    <label class="form-field">
+      <span>CUIT</span>
+      <input type="text" formControlName="cuit" [readonly]="isEditMode" placeholder="20304050607" />
+    </label>
+    <label class="form-field">
+      <span>Razón social</span>
+      <input type="text" formControlName="razon_social" placeholder="Proveedor SA" />
+    </label>
+    <label class="form-field">
+      <span>Teléfono</span>
+      <input type="text" formControlName="telefono" placeholder="1122334455" />
+    </label>
+    <label class="form-field">
+      <span>Email</span>
+      <input type="email" formControlName="email" placeholder="proveedor@email.com" />
+    </label>
+    <label class="form-field">
+      <span>Calle</span>
+      <input type="text" formControlName="calle" placeholder="Av. Siempre Viva" />
+    </label>
+    <label class="form-field">
+      <span>Número</span>
+      <input type="number" formControlName="numero" placeholder="123" />
+    </label>
+    <label class="form-field">
+      <span>Código postal</span>
+      <input type="text" formControlName="codigo_postal" placeholder="1414" />
+    </label>
+    <label class="form-field">
+      <span>Ciudad</span>
+      <input type="text" formControlName="ciudad" placeholder="Buenos Aires" />
+    </label>
+    <label class="form-field">
+      <span>Tipo de proveedor</span>
+      <select formControlName="tipo_proveedor">
+        <option value="" disabled>Seleccionar tipo</option>
+        <option *ngFor="let tipo of tipoOptions" [value]="tipo.value">{{ tipo.label }}</option>
+      </select>
+    </label>
+
+    <label class="form-field" *ngIf="form.get('tipo_proveedor')?.value === 'servicios_mensuales'">
+      <span>Número de cuenta</span>
+      <input type="text" formControlName="numero_cuenta" placeholder="000123" />
+    </label>
+    <label class="form-field" *ngIf="form.get('tipo_proveedor')?.value">
+      <span>Teléfono de reclamo</span>
+      <input type="text" formControlName="numero_reclamo" placeholder="0800-123-456" />
+    </label>
+
+    <div class="modal-actions">
+      <button type="button" class="cancel-button" (click)="closeFormModal()">Cancelar</button>
+      <button type="submit" class="submit-button">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()"></div>
+<div class="modal delete-modal" *ngIf="showDeleteModal" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <app-label text="Eliminar proveedor" fontSize="22px" color="#1F2937"></app-label>
+    <button class="icon-button" title="Cerrar" (click)="closeDeleteModal()">
+      <app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+    </button>
+  </div>
+  <div class="delete-content">
+    <div class="delete-icon">
+      <app-icon iconHref="assets/img/sprites.svg#alert" size="26" color="#B91C1C"></app-icon>
+    </div>
+    <p class="delete-title">¿Seguro que quieres eliminar este proveedor?</p>
+    <p class="delete-subtitle">
+      Se eliminará <strong>{{ providerToDelete?.razon_social }}</strong>.
+    </p>
+  </div>
+  <div class="modal-actions">
+    <button type="button" class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+    <button type="button" class="submit-button danger" (click)="confirmDelete()">Eliminar</button>
+  </div>
+</div>

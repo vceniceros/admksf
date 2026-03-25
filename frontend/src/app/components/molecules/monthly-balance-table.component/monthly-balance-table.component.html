@@ -1,0 +1,33 @@
+<div class="monthly-balance-table-container">
+  <table class="monthly-balance-table">
+    <thead>
+      <tr>
+        <th>Unidad</th>
+        <th>Mes</th>
+        <th>Saldo inicial</th>
+        <th>Total gastos</th>
+        <th>Total pagos</th>
+        <th>Saldo final</th>
+        <th class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let balance of balances">
+        <td class="unit">{{ balance.numeroUnidad }}</td>
+        <td>{{ formatDate(balance.mesAnio) }}</td>
+        <td>{{ formatCurrency(balance.saldoInicial) }}</td>
+        <td>{{ formatCurrency(balance.totalGastos) }}</td>
+        <td>{{ formatCurrency(balance.totalPagos) }}</td>
+        <td class="amount">{{ formatCurrency(balance.saldoFinal) }}</td>
+        <td class="actions-column">
+          <button class="icon-button" title="Editar saldo" (click)="onEdit(balance)">
+            <app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+          </button>
+          <button class="icon-button danger" title="Eliminar saldo" (click)="onDelete(balance)">
+            <app-icon iconHref="assets/img/sprites.svg#trash" size="18" color="#B91C1C"></app-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

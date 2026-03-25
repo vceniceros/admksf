@@ -1,0 +1,21 @@
+<div class="payments-page">
+	<div class="page-header">
+		<div>
+			<app-label text="Pagos" fontSize="32px" color="#1F2937"></app-label>
+			<app-label text="Registro de pagos del consorcio" fontSize="16px" color="#6B7280"></app-label>
+		</div>
+		<button class="new-payment-btn" (click)="onAddPayment()">
+			<app-icon iconHref="assets/img/sprites.svg#plus" size="16" color="#FFFFFF"></app-icon>
+			<span>Nuevo Pago</span>
+		</button>
+	</div>
+
+	<div class="table-section">
+		<app-payment-table
+			[payments]="payments"
+			(emailClicked)="onEmailClicked($event)"
+			(editClicked)="onEditPayment($event)"
+			(rejectClicked)="onRejectPayment($event)">
+		</app-payment-table>
+	</div>
+</div>

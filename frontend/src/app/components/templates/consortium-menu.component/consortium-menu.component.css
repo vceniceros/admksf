@@ -1,0 +1,71 @@
+.consortium-menu {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.menu-title ::ng-deep span {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+}
+
+.menu-subtitle ::ng-deep span {
+  font-size: 14px !important;
+  line-height: 1.5;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .consortium-menu {
+    padding: 24px;
+  }
+
+  .menu-header {
+    margin-bottom: 32px;
+  }
+
+  .menu-title ::ng-deep span {
+    font-size: 28px !important;
+  }
+
+  .menu-subtitle ::ng-deep span {
+    font-size: 15px !important;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .consortium-menu {
+    padding: 32px 24px;
+  }
+
+  .menu-header {
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .menu-title ::ng-deep span {
+    font-size: 32px !important;
+  }
+
+  .menu-subtitle ::ng-deep span {
+    font-size: 16px !important;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+  .consortium-menu {
+    padding: 48px 24px;
+  }
+}

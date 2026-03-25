@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="310"
+   height="80"
+   viewBox="0 0 310 80"
+   fill="none"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="logo-prueba.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.9774194"
+     inkscape:cx="155"
+     inkscape:cy="39.967497"
+     inkscape:window-width="1920"
+     inkscape:window-height="1036"
+     inkscape:window-x="0"
+     inkscape:window-y="44"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g6" />
+  <defs
+     id="defs1">
+    <rect
+       x="257.26977"
+       y="9.7399783"
+       width="42.318527"
+       height="46.013001"
+       id="rect7" />
+    <style
+       id="style1">
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700=swap');
+      .text-consorcio { font-family: 'Montserrat', sans-serif; font-weight: 700; fill: #0F2C59; }
+      /* Color azul cian en lugar del verde */
+      .text-360 { font-family: 'Montserrat', sans-serif; font-weight: 700; fill: #00B4D8; }
+    </style>
+  </defs>
+  <g
+     transform="translate(5.2979415,9.9848321)"
+     id="g5">
+    <path
+       d="M 20,10 35,2 50,10 V 40 H 20 Z"
+       fill="#0f2c59"
+       id="path1" />
+    <rect
+       x="26"
+       y="18"
+       width="6"
+       height="6"
+       rx="1"
+       fill="#ffffff"
+       id="rect1" />
+    <rect
+       x="38"
+       y="18"
+       width="6"
+       height="6"
+       rx="1"
+       fill="#ffffff"
+       id="rect2" />
+    <rect
+       x="26"
+       y="28"
+       width="6"
+       height="6"
+       rx="1"
+       fill="#ffffff"
+       id="rect3" />
+    <rect
+       x="38"
+       y="28"
+       width="6"
+       height="6"
+       rx="1"
+       fill="#ffffff"
+       id="rect4" />
+    <path
+       d="M 10,30 C 10,15 25,0 45,0 h 10"
+       stroke="#00b4d8"
+       stroke-width="5"
+       stroke-linecap="round"
+       id="path4" />
+    <path
+       d="m 61.007584,18.764897 c 0,15 -15,30 -35,30 h -10"
+       stroke="#b0b8c3"
+       stroke-width="5"
+       stroke-linecap="round"
+       id="path5" />
+  </g>
+  <g
+     transform="matrix(0.88494899,0,0,1,83.53584,51.313109)"
+     id="g6">
+    <text
+       x="0"
+       y="0"
+       font-size="34px"
+       class="text-consorcio"
+       id="text5">Consorcio</text>
+    <text
+       x="190"
+       y="0"
+       font-size="34px"
+       class="text-360"
+       id="text6">360</text>
+    <text
+       xml:space="preserve"
+       transform="matrix(1.1300086,0,0,1,-94.396221,-51.313109)"
+       id="text7"
+       style="fill:#000000;text-orientation:auto;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect7)" />
+  </g>
+</svg>

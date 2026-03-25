@@ -1,0 +1,37 @@
+<div class="consortium-card" (click)="onCardClick()">
+  <app-card-image [imageUrl]="consortium.imageUrl" [alt]="consortium.name"></app-card-image>
+  <div class="card-content">
+    <div class="card-header">
+      <app-label [text]="consortium.name" fontSize="18px" color="#1F2937"></app-label>
+      <div class="card-actions">
+        <app-status-label [status]="consortium.status"></app-status-label>
+        <button class="icon-button" title="Editar consorcio" (click)="onEditClick($event)">
+          <app-icon iconHref="assets/img/sprites.svg#settings" size="18" color="#4B5563"></app-icon>
+        </button>
+        <button class="icon-button danger" title="Eliminar consorcio" (click)="onDeleteClick($event)">
+          <app-icon iconHref="assets/img/sprites.svg#trash" size="18" color="#B91C1C"></app-icon>
+        </button>
+      </div>
+    </div>
+    <div class="card-info">
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#map-pin" 
+        [text]="consortium.address"
+        fontSize="14px">
+      </app-info-row>
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#building" 
+        [text]="consortium.units + ' unidades'"
+        fontSize="14px">
+      </app-info-row>
+      <app-info-row 
+        iconHref="assets/img/sprites.svg#profile" 
+        [text]="consortium.owners + ' propietarios'"
+        fontSize="14px">
+      </app-info-row>
+    </div>
+    <div class="card-action">
+      <app-icon iconHref="assets/img/sprites.svg#chevron-right" size="20" color="#9CA3AF"></app-icon>
+    </div>
+  </div>
+</div>

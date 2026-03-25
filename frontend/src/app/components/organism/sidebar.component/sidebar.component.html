@@ -1,0 +1,77 @@
+<nav 
+  class="sidebar transition-transform duration-300 flex-shrink-0"
+  [class.hidden-mobile]="!isVisible"
+  [class.visible-desktop]="true"> 
+  
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#dashboard" 
+    label="Dashboard" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="dashboardRoute"
+    [isActive]="false">
+  </app-navbar-item>
+  
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#profile" 
+    label="Propietarios" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="ownersRoute"
+    [isActive]="false">
+  </app-navbar-item>
+
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#home" 
+    label="Unidades" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="unitsRoute"
+    [isActive]="false">
+  </app-navbar-item>
+
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#shield" 
+    label="Proveedores" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="providersRoute"
+    [isActive]="false">
+  </app-navbar-item>
+
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#piggy-bank" 
+    label="Saldo Mensual" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="monthlyBalanceRoute"
+    [isActive]="false">
+  </app-navbar-item>
+
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#piggy-bank" 
+    label="Pagos" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="paymentsRoute"
+    [isActive]="false">
+  </app-navbar-item>
+  
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#expenses" 
+    label="Gastos" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="expensesRoute"
+    [isActive]="false">
+  </app-navbar-item>
+
+  <app-navbar-item 
+    iconHref="assets/img/sprites.svg#expenses" 
+    label="Expensas" 
+    size="24" 
+    iconColor="#000000" 
+    [routerLink]="settlementRoute"
+    [isActive]="false">
+  </app-navbar-item>
+</nav>

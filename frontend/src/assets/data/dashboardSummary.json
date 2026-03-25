@@ -1,0 +1,20 @@
+{
+    "consortiumId": 1,
+    "financials": {
+      "monthlyIncome": 124500,
+      "monthlyExpenses": 89200,
+      "incomeTrend": 12,
+      "expenseTrend": -5
+    },
+    "collection": {
+      "percentage": 94,
+      "collectedAmount": 124500,
+      "pendingAmount": 8000
+    },
+    "occupancy": {
+      "total": 48,
+      "occupied": 45,
+      "rented": 1,
+      "empty": 2
+    }
+}

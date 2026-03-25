@@ -1,0 +1,144 @@
+{
+  "schema": "consorcio360Bdd",
+  "tables": [
+    {
+      "name": "consorcios",
+      "primaryKey": "cuit",
+      "columns": [
+        {"name": "cuit", "type": "VARCHAR(11)", "constraints": "PRIMARY KEY"},
+        {"name": "razon_social", "type": "VARCHAR(100)", "constraints": "NOT NULL"},
+        {"name": "calle", "type": "VARCHAR(100)", "constraints": "NOT NULL"},
+        {"name": "numero", "type": "INTEGER", "constraints": "NOT NULL, CHECK > 0 AND < 60000"},
+        {"name": "codigo_postal", "type": "VARCHAR(10)", "constraints": "NOT NULL"},
+        {"name": "ciudad", "type": "VARCHAR(50)", "constraints": "NOT NULL"},
+        {"name": "interes_por_mora", "type": "DECIMAL(5,2)", "constraints": "NOT NULL, CHECK >= 0"},
+        {"name": "redondeo_aumento", "type": "DECIMAL(5,2)", "constraints": "NOT NULL, CHECK >= 0"},
+        {"name": "imagen_url", "type": "VARCHAR(255)", "constraints": ""}
+      ]
+    },
+    {
+      "name": "propietarios",
+      "primaryKey": "dni",
+      "columns": [
+        {"name": "dni", "type": "VARCHAR(15)", "constraints": "PRIMARY KEY, CHECK only numbers"},
+        {"name": "nombre", "type": "VARCHAR(50)", "constraints": "NOT NULL"},
+        {"name": "apellido", "type": "VARCHAR(50)", "constraints": "NOT NULL"},
+        {"name": "telefono", "type": "VARCHAR(20)", "constraints": ""},
+        {"name": "email", "type": "VARCHAR(100)", "constraints": ""}
+      ]
+    },
+    {
+      "name": "unidades_funcionales",
+      "primaryKey": ["numero_de_unidad_funcional", "cuit_consorcio"],
+      "foreignKeys": [
+        {"column": "cuit_consorcio", "references": "consorcios(cuit)"},
+        {"column": "dni_propietario", "references": "propietarios(dni)"}
+      ],
+      "columns": [
+        {"name": "numero_de_unidad_funcional", "type": "INTEGER", "constraints": "PK"},
+        {"name": "cuit_consorcio", "type": "VARCHAR(11)", "constraints": "PK, FK"},
+        {"name": "tipo_de_unidad", "type": "VARCHAR(50)", "constraints": "NOT NULL, CHECK IN ('Departamento', 'Lote')"},
+        {"name": "superficie", "type": "DECIMAL(7,2)", "constraints": "NOT NULL, CHECK > 0"},
+        {"name": "dni_propietario", "type": "VARCHAR(15)", "constraints": "NOT NULL, FK"}
+      ]
+    },
+    {
+      "name": "proveedores",
+      "primaryKey": "cuit",
+      "columns": [
+        {"name": "cuit", "type": "VARCHAR(11)", "constraints": "PRIMARY KEY"},
+        {"name": "razon_social", "type": "VARCHAR(100)", "constraints": "NOT NULL"},
+        {"name": "telefono", "type": "VARCHAR(20)", "constraints": ""},
+        {"name": "email", "type": "VARCHAR(100)", "constraints": ""},
+        {"name": "calle", "type": "VARCHAR(100)", "constraints": "NOT NULL"},
+        {"name": "numero", "type": "INTEGER", "constraints": "NOT NULL, CHECK > 0 AND < 60000"},
+        {"name": "codigo_postal", "type": "VARCHAR(10)", "constraints": "NOT NULL"},
+        {"name": "ciudad", "type": "VARCHAR(50)", "constraints": "NOT NULL"},
+        {"name": "tipo_proveedor", "type": "VARCHAR(20)", "constraints": "NOT NULL, CHECK IN ('servicios_mensuales', 'reparaciones_mantenimientos')"}
+      ]
+    },
+    {
+      "name": "servicios_mensuales",
+      "description": "Especialización de Proveedores",
+      "primaryKey": "cuit",
+      "foreignKeys": [
+        {"column": "cuit", "references": "proveedores(cuit) ON DELETE CASCADE"}
+      ],
+      "columns": [
+        {"name": "cuit", "type": "VARCHAR(11)", "constraints": "PRIMARY KEY, FK"},
+        {"name": "numero_cuenta", "type": "VARCHAR(50)", "constraints": "NOT NULL"},
+        {"name": "numero_reclamo", "type": "VARCHAR(50)", "constraints": "NOT NULL"}
+      ]
+    },
+    {
+      "name": "reparaciones_mantenimientos",
+      "description": "Especialización de Proveedores",
+      "primaryKey": "cuit",
+      "foreignKeys": [
+        {"column": "cuit", "references": "proveedores(cuit) ON DELETE CASCADE"}
+      ],
+      "columns": [
+        {"name": "cuit", "type": "VARCHAR(11)", "constraints": "PRIMARY KEY, FK"},
+        {"name": "numero_reclamo", "type": "VARCHAR(50)", "constraints": "NOT NULL"}
+      ]
+    },
+    {
+      "name": "gastos",
+      "primaryKey": "id_gasto",
+      "foreignKeys": [
+        {"column": "cuit_consorcio", "references": "consorcios(cuit)"},
+        {"column": "cuit_proveedor", "references": "proveedores(cuit)"}
+      ],
+      "columns": [
+        {"name": "id_gasto", "type": "SERIAL", "constraints": "PRIMARY KEY"},
+        {"name": "cuit_consorcio", "type": "VARCHAR(11)", "constraints": "NOT NULL, FK"},
+        {"name": "cuit_proveedor", "type": "VARCHAR(11)", "constraints": "NOT NULL, FK"},
+        {"name": "periodo", "type": "DATE", "constraints": "NOT NULL"},
+        {"name": "descripcion", "type": "TEXT", "constraints": "NOT NULL"},
+        {"name": "monto", "type": "DECIMAL(10,2)", "constraints": "NOT NULL, CHECK > 0"},
+        {"name": "fecha_registro", "type": "TIMESTAMP", "constraints": "NOT NULL, DEFAULT CURRENT_TIMESTAMP"},
+        {"name": "tipo_gasto", "type": "VARCHAR(20)", "constraints": "NOT NULL, CHECK IN ('Mantenimiento', 'Servicios', 'Limpieza', 'Seguridad', 'Administracion', 'Otros'), DEFAULT 'Otros'"},
+        {"name": "estado_pago", "type": "VARCHAR(20)", "constraints": "NOT NULL, CHECK IN ('Pendiente', 'Pagado'), DEFAULT 'Pendiente'"}
+      ]
+    },
+    {
+      "name": "saldo_mensual",
+      "primaryKey": "id_saldo_mensual",
+      "uniqueConstraints": [
+        {"columns": ["numero_de_unidad_funcional", "cuit_consorcio", "mes_año"]}
+      ],
+      "foreignKeys": [
+        {"columns": ["numero_de_unidad_funcional", "cuit_consorcio"], "references": "unidades_funcionales(numero_de_unidad_funcional, cuit_consorcio)"},
+        {"column": "cuit_consorcio", "references": "consorcios(cuit)"}
+      ],
+      "columns": [
+        {"name": "id_saldo_mensual", "type": "SERIAL", "constraints": "PRIMARY KEY"},
+        {"name": "numero_de_unidad_funcional", "type": "INTEGER", "constraints": "NOT NULL"},
+        {"name": "cuit_consorcio", "type": "VARCHAR(11)", "constraints": "NOT NULL"},
+        {"name": "mes_año", "type": "DATE", "constraints": "NOT NULL"},
+        {"name": "saldo_inicial", "type": "DECIMAL(10,2)", "constraints": "NOT NULL, DEFAULT 0, CHECK >= 0"},
+        {"name": "total_gastos", "type": "DECIMAL(10,2)", "constraints": "NOT NULL, DEFAULT 0, CHECK >= 0"},
+        {"name": "total_pagos", "type": "DECIMAL(10,2)", "constraints": "NOT NULL, DEFAULT 0, CHECK >= 0"},
+        {"name": "saldo_final", "type": "DECIMAL(10,2)", "constraints": "GENERATED ALWAYS AS (saldo_inicial + total_gastos - total_pagos) STORED"},
+        {"name": "fecha_cierre", "type": "TIMESTAMP", "constraints": ""}
+      ]
+    },
+    {
+      "name": "pagos",
+      "primaryKey": ["id_pago", "numero_de_unidad_funcional", "cuit_consorcio"],
+      "foreignKeys": [
+        {"columns": ["numero_de_unidad_funcional", "cuit_consorcio"], "references": "unidades_funcionales(numero_de_unidad_funcional, cuit_consorcio)"},
+        {"column": "dni_propietario", "references": "propietarios(dni)"}
+      ],
+      "columns": [
+        {"name": "id_pago", "type": "SERIAL", "constraints": "PK"},
+        {"name": "numero_de_unidad_funcional", "type": "INTEGER", "constraints": "PK"},
+        {"name": "cuit_consorcio", "type": "VARCHAR(11)", "constraints": "PK"},
+        {"name": "dni_propietario", "type": "VARCHAR(15)", "constraints": "NOT NULL, FK"},
+        {"name": "monto", "type": "DECIMAL(10,2)", "constraints": "NOT NULL, CHECK > 0"},
+        {"name": "estado_pago", "type": "VARCHAR(20)", "constraints": "NOT NULL, CHECK IN ('Aprobado', 'Pendiente', 'Parcial'), DEFAULT 'Pendiente'"},
+        {"name": "fecha_pago", "type": "TIMESTAMP", "constraints": "NOT NULL, DEFAULT CURRENT_TIMESTAMP"}
+      ]
+    }
+  ]
+}

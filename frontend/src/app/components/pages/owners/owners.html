@@ -1,0 +1,79 @@
+<div class="owners-page">
+	<div class="page-header">
+		<div>
+			<app-label text="Propietarios" fontSize="32px" color="#1F2937"></app-label>
+			<app-label text="Registro de propietarios del consorcio" fontSize="16px" color="#6B7280"></app-label>
+		</div>
+		<button class="new-owner-btn" (click)="openCreateModal()">
+			<app-icon iconHref="assets/img/sprites.svg#plus" size="16" color="#FFFFFF"></app-icon>
+			<span>Nuevo Propietario</span>
+		</button>
+	</div>
+
+	<div class="table-section">
+		<app-owners-table
+			[owners]="owners"
+			(editOwner)="openEditModal($event)"
+			(deleteOwner)="onDeleteOwner($event)">
+		</app-owners-table>
+	</div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showFormModal" (click)="closeFormModal()"></div>
+<div class="modal" *ngIf="showFormModal" role="dialog" aria-modal="true">
+	<div class="modal-header">
+		<app-label [text]="isEditMode ? 'Editar propietario' : 'Nuevo propietario'" fontSize="22px" color="#1F2937"></app-label>
+		<button class="icon-button" title="Cerrar" (click)="closeFormModal()">
+			<app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+		</button>
+	</div>
+	<form class="modal-form" [formGroup]="form" (ngSubmit)="submitForm()">
+		<label class="form-field">
+			<span>DNI</span>
+			<input type="text" formControlName="dni" placeholder="12345678" [disabled]="isEditMode" />
+		</label>
+		<label class="form-field">
+			<span>Nombre</span>
+			<input type="text" formControlName="nombre" placeholder="Juan" />
+		</label>
+		<label class="form-field">
+			<span>Apellido</span>
+			<input type="text" formControlName="apellido" placeholder="Pérez" />
+		</label>
+		<label class="form-field">
+			<span>Teléfono</span>
+			<input type="text" formControlName="telefono" placeholder="11 2345 6789" />
+		</label>
+		<label class="form-field full">
+			<span>Email</span>
+			<input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+		</label>
+		<div class="modal-actions">
+			<button type="button" class="cancel-button" (click)="closeFormModal()">Cancelar</button>
+			<button type="submit" class="submit-button">{{ isEditMode ? 'Guardar' : 'Crear' }}</button>
+		</div>
+	</form>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()"></div>
+<div class="modal delete-modal" *ngIf="showDeleteModal" role="dialog" aria-modal="true">
+	<div class="modal-header">
+		<app-label text="Eliminar propietario" fontSize="22px" color="#1F2937"></app-label>
+		<button class="icon-button" title="Cerrar" (click)="closeDeleteModal()">
+			<app-icon iconHref="assets/img/sprites.svg#x" size="18" color="#6B7280"></app-icon>
+		</button>
+	</div>
+	<div class="delete-content">
+		<div class="delete-icon">
+			<app-icon iconHref="assets/img/sprites.svg#alert" size="26" color="#B91C1C"></app-icon>
+		</div>
+		<p class="delete-title">¿Seguro que quieres eliminar este propietario?</p>
+		<p class="delete-subtitle">
+			Se eliminará <strong>{{ ownerToDelete?.nombre }} {{ ownerToDelete?.apellido }}</strong> y no podrá deshacerse.
+		</p>
+	</div>
+	<div class="modal-actions">
+		<button type="button" class="cancel-button" (click)="closeDeleteModal()">Cancelar</button>
+		<button type="button" class="submit-button danger" (click)="confirmDelete()">Eliminar</button>
+	</div>
+</div>

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "type": "WARNING",
+    "message": "3 unidades con deuda mayor a 2 meses",
+    "timestamp": "Hace 2 horas"
+  },
+  {
+    "id": 2,
+    "type": "ERROR",
+    "message": "Seguro del edificio vence en 15 días",
+    "timestamp": "Hace 5 horas"
+  },
+  {
+    "id": 3,
+    "type": "INFO",
+    "message": "Nueva norma municipal sobre residuos",
+    "timestamp": "Ayer"
+  }
+]

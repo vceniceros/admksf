@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "date": "15/01/2026",
+    "description": "Se reemplazó la cerradura principal del edificio"
+  },
+  {
+    "id": 2,
+    "date": "10/01/2026",
+    "description": "Mantenimiento preventivo de los ascensores realizado"
+  },
+  {
+    "id": 3,
+    "date": "05/01/2026",
+    "description": "Reparación de la bomba de agua del tanque principal"
+  },
+  {
+    "id": 4,
+    "date": "02/01/2026",
+    "description": "Instalación de nuevas luminarias LED en el hall de entrada"
+  },
+  {
+    "id": 5,
+    "date": "28/12/2025",
+    "description": "Fumigación general del edificio completada"
+  }
+]
