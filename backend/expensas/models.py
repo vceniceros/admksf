@@ -109,6 +109,14 @@ class ExpensaRule(models.Model):
         )
 
 
+class EstadoLiquidacion(models.TextChoices):
+    """Estados permitidos de una liquidación de expensas."""
+
+    BORRADOR = "BORRADOR", "Borrador"
+    EN_EDICION = "EN_EDICION", "En edición"
+    CERRADA = "CERRADA", "Cerrada"
+
+
 class LiquidacionExpensa(models.Model):
     """Resultado inmutable de una liquidación de expensas."""
 
@@ -134,6 +142,12 @@ class LiquidacionExpensa(models.Model):
     template_snapshot = models.JSONField(db_column="template_snapshot")
     creada_en = models.DateTimeField(db_column="creada_en", auto_now_add=True)
     cerrada = models.BooleanField(db_column="cerrada", default=False)
+    estado = models.CharField(
+        max_length=20,
+        db_column="estado",
+        choices=EstadoLiquidacion.choices,
+        default=EstadoLiquidacion.BORRADOR,
+    )
 
     class Meta:
         db_table = "liquidaciones_expensa"

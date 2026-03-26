@@ -70,6 +70,13 @@ class UnidadFuncional(models.Model):
         db_column="superficie",
         validators=[min_value_validator(Decimal("0.01"), "Superficie")],
     )
+    coeficiente = models.DecimalField(
+        max_digits=6,
+        decimal_places=4,
+        db_column="coeficiente",
+        null=True,
+        blank=True,
+    )
     propietario = models.ForeignKey(
         "propietarios.Propietario",
         on_delete=models.CASCADE,
