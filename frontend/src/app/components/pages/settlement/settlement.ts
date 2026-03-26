@@ -20,7 +20,7 @@ import { SettlementValuePipe } from '../../../shared/pipes/settlement-value.pipe
   templateUrl: './settlement.html',
   styleUrl: './settlement.css',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class SettlementComponent implements OnInit {
   consortiumName: string = '';
