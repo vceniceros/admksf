@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable, map } from 'rxjs';
@@ -16,7 +16,7 @@ import { SettlementValuePipe } from '../../../shared/pipes/settlement-value.pipe
 
 @Component({
   selector: 'app-settlement',
-  imports: [CommonModule, FormsModule, CurrencyPipe, SettlementValuePipe],
+  imports: [CommonModule, FormsModule, SettlementValuePipe],
   templateUrl: './settlement.html',
   styleUrl: './settlement.css',
   standalone: true,
