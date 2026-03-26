@@ -9,17 +9,18 @@ export enum TipoGasto {
 
 export enum EstadoPago {
   PENDIENTE = 'Pendiente',
-  PAGADO = 'Pagado'
+  APROBADO = 'Aprobado',
+  PARCIAL = 'Parcial'
 }
 
 export interface Spend {
   idGasto: number;
   cuitConsorcio: string;
   cuitProveedor: string;
-  periodo: string; // DATE format (YYYY-MM-DD)
+  periodo: string;
   descripcion: string;
   monto: number;
-  fechaRegistro: string; // TIMESTAMP format
+  fechaRegistro: string;
   tipoGasto: TipoGasto;
   estadoPago: EstadoPago;
 }

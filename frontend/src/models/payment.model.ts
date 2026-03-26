@@ -1,4 +1,4 @@
-export type PaymentStatus = 'PAID' | 'PENDING' | 'Aprobado' | 'Pendiente' | 'Parcial';
+export type PaymentStatus = 'Aprobado' | 'Pendiente' | 'Parcial';
 
 export interface Payment {
   id: number;

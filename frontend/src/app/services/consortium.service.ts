@@ -19,7 +19,7 @@ export class ConsortiumService {
     );
   }
 
-  getConsortiumById(id: number): Observable<Consortium | undefined> {
+  getConsortiumById(id: string): Observable<Consortium | undefined> {
     const cuit = String(id);
     return this.http.get<{ status: string; data: any }>(`${this.apiUrl}${cuit}/`).pipe(
       map(response => (response?.data ? this.mapConsortium(response.data) : undefined))
@@ -56,7 +56,7 @@ export class ConsortiumService {
       : (item.address || 'Sin dirección');
 
     return {
-      id: Number(item.cuit ?? item.id ?? 0),
+      id: String(item.cuit ?? item.id ?? ""),
       name: item.razon_social ?? item.name ?? 'Consorcio sin nombre',
       status: (item.status as ConsortiumStatus) ?? ConsortiumStatus.ACTIVE,
       address,

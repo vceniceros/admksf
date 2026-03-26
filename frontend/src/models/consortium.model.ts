@@ -5,7 +5,7 @@ export enum ConsortiumStatus {
 }
 
 export interface Consortium {
-  id: number;
+  id: string;
   name: string;
   status: ConsortiumStatus;
   address: string;

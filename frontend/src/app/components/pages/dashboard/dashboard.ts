@@ -42,7 +42,7 @@ import { IconComponent } from '../../atoms/icon.component/icon.component';
 })
 export class Dashboard implements OnInit {
   consortiumName: string = '';
-  consortiumId: number = 1;
+  consortiumId: string = "";
   dashboardSummary: DashboardSummary | null = null;
   servicesStatus: ServiceStatusItem[] = [];
   lastPayments: Payment[] = [];

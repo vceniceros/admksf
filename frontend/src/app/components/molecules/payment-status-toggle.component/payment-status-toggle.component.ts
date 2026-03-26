@@ -24,9 +24,9 @@ export class PaymentStatusToggleComponent {
   }
 
   onConfirmStatusChange(): void {
-    const newStatus = this.spend.estadoPago === EstadoPago.PAGADO 
+    const newStatus = this.spend.estadoPago === EstadoPago.APROBADO 
       ? EstadoPago.PENDIENTE 
-      : EstadoPago.PAGADO;
+      : EstadoPago.APROBADO;
     
     this.statusChanged.emit({ spend: this.spend, newStatus });
   }

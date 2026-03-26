@@ -34,7 +34,7 @@ export class Units implements OnInit {
   unitToDelete: Unit | null = null;
   form: FormGroup;
   estados = ['Propietario', 'Inquilino', 'Vacio'];
-  tipos = ['Departamento', 'Lote'];
+  tipos = ['Departamento', 'Lote', 'PH'];
 
   constructor(
     private route: ActivatedRoute,

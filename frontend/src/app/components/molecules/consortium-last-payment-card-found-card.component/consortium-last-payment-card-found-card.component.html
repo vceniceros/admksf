@@ -12,9 +12,9 @@
         <app-label [text]="payment.unit || '-'" fontSize="12px" color="#9CA3AF"></app-label>
       </div>
       <div class="payment-amount">
-        <app-label [text]="'$' + payment.amount.toLocaleString()" fontSize="14px" [color]="payment.status === 'PAID' ? '#10B981' : '#1F2937'" style="font-weight: 600;"></app-label>
-        <span class="status-badge" [ngClass]="payment.status === 'PAID' ? 'paid' : 'pending'">
-          {{payment.status === 'PAID' ? 'Pagado' : 'Pendiente'}}
+        <app-label [text]="'$' + payment.amount.toLocaleString()" fontSize="14px" [color]="payment.status === 'Aprobado' ? '#10B981' : '#1F2937'" style="font-weight: 600;"></app-label>
+        <span class="status-badge" [ngClass]="payment.status === 'Aprobado' ? 'paid' : 'pending'">
+          {{payment.status === 'Aprobado' ? 'Pagado' : 'Pendiente'}}
         </span>
       </div>
     </div>

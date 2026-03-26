@@ -1,7 +1,7 @@
 <div class="payment-status-toggle">
   <button 
     class="status-button"
-    [class.paid]="spend.estadoPago === EstadoPago.PAGADO"
+    [class.paid]="spend.estadoPago === EstadoPago.APROBADO"
     [class.pending]="spend.estadoPago === EstadoPago.PENDIENTE"
     (click)="onStatusClick()"
     [title]="'Haz clic para ' + (spend.estadoPago === EstadoPago.PENDIENTE ? 'confirmar pago' : 'revertir pago')">

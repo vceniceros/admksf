@@ -11,7 +11,7 @@ export class NotificationsService {
 
   constructor(private http: HttpClient) { }
 
-  getNotifications(consortiumId: number): Observable<Notification[]> {
+  getNotifications(consortiumId: number | string): Observable<Notification[]> {
     // Por ahora consume el JSON estático
     // Más adelante consumirá del backend con el consortiumId
     return this.http.get<Notification[]>(this.jsonUrl);
