@@ -12,3 +12,6 @@ __pycache__/
 our-ratio-*.json
 settings_prod_backup.py
 docker-compose.yml.bak
+
+# Cursor IDE
+.cursorrules
