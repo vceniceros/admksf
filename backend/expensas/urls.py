@@ -9,7 +9,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("liquidar/", views.liquidar_expensa, name="liquidar-expensa"),
     path("templates/", views.listar_templates, name="listar-templates"),
     path(
         "templates/consorcio/<str:cuit_consorcio>/",
