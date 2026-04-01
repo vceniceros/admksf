@@ -9,7 +9,7 @@ export enum TipoGasto {
 
 export enum EstadoPago {
   PENDIENTE = 'Pendiente',
-  APROBADO = 'Aprobado',
+  PAGADO = 'Pagado',
   PARCIAL = 'Parcial'
 }
 

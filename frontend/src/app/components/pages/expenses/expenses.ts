@@ -82,7 +82,7 @@ export class Expenses implements OnInit {
   calculateBalances() {
     this.totalSpends = this.spends.reduce((sum, spend) => sum + spend.monto, 0);
     this.paidSpends = this.spends
-      .filter(spend => spend.estadoPago === EstadoPago.APROBADO)
+      .filter(spend => spend.estadoPago === EstadoPago.PAGADO)
       .reduce((sum, spend) => sum + spend.monto, 0);
     this.pendingSpends = this.spends
       .filter(spend => spend.estadoPago === EstadoPago.PENDIENTE)
