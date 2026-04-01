@@ -281,3 +281,13 @@ sudo wg show
 curl -s -o /dev/null -w "Prod: %{http_code}\n" http://127.0.0.1:8001
 curl -s -o /dev/null -w "Staging: %{http_code}\n" http://127.0.0.1:8002
 ```
+
+---
+
+## 10. Bugs resueltos
+
+### Sesión 01 Abril 2026
+- **Bug $0.00 en liquidación:** El builder usaba 0 como fallback cuando coeficiente=custom y no venían coeficientes_custom en el payload. Fix: builder.py ahora lee uf.coeficiente desde la BD como fallback.
+- **estado_pago mismatch:** Frontend enviaba 'Aprobado' pero el backend solo acepta 'Pendiente'|'Pagado'|'Parcial'. Fix: alineado frontend al backend en spends.model.ts, payment-status-toggle y expenses.ts.
+- **Middleware eliminado:** WebhookTokenAuthMiddleware removido de settings.py — el login reemplaza la protección.
+- **Ruta duplicada eliminada:** /api/expensas/liquidar/ removida de expensas/urls.py.
