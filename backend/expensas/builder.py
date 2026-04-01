@@ -92,7 +92,7 @@ class LiquidacionBuilder:
                     context,
                     gastos_por_tipo,
                     total_gastos,
-                    uf.numero_de_unidad_funcional,
+                    uf,
                 )
                 if column.get("apply_rounding", False):
                     value = self._rounding_strategy.apply(value)
@@ -173,14 +173,15 @@ class LiquidacionBuilder:
         context: Dict[str, Decimal],
         gastos_por_tipo: Mapping[str, Decimal],
         total_gastos: Decimal,
-        unidad_numero: int,
+        uf: UnidadFuncional,
     ) -> Decimal:
+        unidad_numero = uf.numero_de_unidad_funcional
         if calc_type == "saldo_anterior":
             return context.get("saldo_anterior", Decimal("0"))
         if calc_type == "interes":
             return self._calculate_interes(column, context)
         if calc_type == "prorrateo":
-            return self._calculate_prorrateo(column, gastos_por_tipo, total_gastos, context, unidad_numero)
+            return self._calculate_prorrateo(column, gastos_por_tipo, total_gastos, context, uf)
         if calc_type == "fijo":
             return parse_decimal(column.get("valor", 0))
         if calc_type == "concepto_particular":
@@ -198,13 +199,15 @@ class LiquidacionBuilder:
         gastos_por_tipo: Mapping[str, Decimal],
         total_gastos: Decimal,
         context: Dict[str, Decimal],
-        unidad_numero: int,
+        uf: UnidadFuncional,
     ) -> Decimal:
         gasto_tipo = column.get("gasto_tipo")
         base_gasto = total_gastos if not gasto_tipo else gastos_por_tipo.get(gasto_tipo, Decimal("0"))
         coef_type = column.get("coeficiente", "superficie")
         if coef_type == "custom":
-            coef_val = parse_decimal(self._custom_coeficientes.get(str(unidad_numero), 0))
+            coef_val = parse_decimal(
+                self._custom_coeficientes.get(str(uf.numero_de_unidad_funcional), uf.coeficiente)
+            )
         else:
             coef_val = context.get("coeficiente_superficie", Decimal("0"))
         return base_gasto * coef_val
