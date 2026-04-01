@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, map, shareReplay } from 'rxjs';
 
 import { ConsortiumService } from '../../../services/consortium.service';
 import { SettlementService } from '../../../services/settlement.service';
@@ -34,7 +34,8 @@ export class SettlementComponent implements OnInit {
 
   private settlementSubject = new BehaviorSubject<SettlementResponse | null>(null);
   settlement$ = this.settlementSubject.asObservable().pipe(
-    map(response => (response ? this.mapToTableState(response) : null))
+    map(response => (response ? this.mapToTableState(response) : null)),
+    shareReplay(1)
   );
 
   isPreviewLoading = false;
