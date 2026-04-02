@@ -9,12 +9,14 @@ import {
   RegisterPayload,
   RegisterResult
 } from '../../models/auth.model';
+import { ApiErrorService } from './api-error.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly apiErrorService = inject(ApiErrorService);
   private readonly sessionStorageKey = 'consorcio360.auth.session';
   private readonly loginUrl = '/api/usuarios/login/';
   private readonly registerUrl = '/api/usuarios/registrar/';
@@ -92,34 +94,12 @@ export class AuthService {
   }
 
   extractErrorMessage(error: unknown, fallback = 'Ocurrió un error inesperado.'): string {
-    if (!(error instanceof HttpErrorResponse)) {
-      return fallback;
-    }
-
-    const backendMessage = error.error?.message;
-    const backendErrors = error.error?.errors as Record<string, string[]> | undefined;
-
-    if (backendErrors) {
-      const firstError = Object.values(backendErrors)
-        .flat()
-        .find(Boolean);
-
-      if (firstError) {
-        return firstError;
-      }
-    }
-
-    if (typeof backendMessage === 'string' && backendMessage.trim()) {
-      return backendMessage;
-    }
-
-    return fallback;
+    return this.apiErrorService.extractMessage(error, fallback);
   }
 
   handleHttpError<T>(fallback: string) {
     return (error: unknown): Observable<T> => {
-      const message = this.extractErrorMessage(error, fallback);
-      return throwError(() => new Error(message));
+      return throwError(() => this.apiErrorService.toAppError(error, fallback));
     };
   }
 

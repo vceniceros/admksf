@@ -4,11 +4,12 @@ Fecha:
     31 - 01 - 2026
 """
 
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from shared.api_responses import exception_response, success_response
+from shared.auth import ensure_proveedor_access, filter_proveedores_queryset, get_request_user
 
 from .services import ServicioMensualService
 
@@ -29,24 +30,12 @@ def crear_servicio_mensual(request):
         if "proveedor" in datos:
             datos["proveedor_id"] = datos.pop("proveedor")
         sm = ServicioMensualService.crear_servicio_mensual(datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Servicio mensual creado exitosamente",
-            "data": {
-                "cuit": str(sm.proveedor.cuit),
-                "numero_cuenta": sm.numero_cuenta,
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "cuit": str(sm.proveedor.cuit),
+            "numero_cuenta": sm.numero_cuenta,
+        }, message="Servicio mensual creado exitosamente", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear servicio mensual.")
 
 
 @csrf_exempt
@@ -54,21 +43,21 @@ def crear_servicio_mensual(request):
 def obtener_servicio_mensual(request, cuit_proveedor):
     """Obtiene un servicio mensual específico."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_proveedor_access(
+            ServicioMensualService.listar_servicios_mensuales(),
+            usuario_autenticado,
+            cuit_proveedor,
+        )
         sm = ServicioMensualService.obtener_servicio_mensual(cuit_proveedor)
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "cuit": str(sm.proveedor.cuit),
-                "razon_social": sm.proveedor.razon_social,
-                "numero_cuenta": sm.numero_cuenta,
-                "numero_reclamo": sm.numero_reclamo,
-            }
+        return success_response({
+            "cuit": str(sm.proveedor.cuit),
+            "razon_social": sm.proveedor.razon_social,
+            "numero_cuenta": sm.numero_cuenta,
+            "numero_reclamo": sm.numero_reclamo,
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Servicio mensual no encontrado: {str(e)}",
-        }, status=404)
+        return exception_response(e, not_found_message="Servicio mensual no encontrado.")
 
 
 @csrf_exempt
@@ -76,23 +65,21 @@ def obtener_servicio_mensual(request, cuit_proveedor):
 def listar_servicios_mensuales(request):
     """Lista todos los servicios mensuales."""
     try:
-        sms = ServicioMensualService.listar_servicios_mensuales()
+        usuario_autenticado = get_request_user(request)
+        sms = filter_proveedores_queryset(
+            ServicioMensualService.listar_servicios_mensuales(),
+            usuario_autenticado,
+            field_name="proveedor__gasto__consorcio_id",
+        )
         datos = [{
             "cuit": str(sm.proveedor.cuit),
             "razon_social": sm.proveedor.razon_social,
             "numero_cuenta": sm.numero_cuenta,
             "numero_reclamo": sm.numero_reclamo,
         } for sm in sms]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -100,28 +87,31 @@ def listar_servicios_mensuales(request):
 def actualizar_servicio_mensual(request, cuit_proveedor):
     """Actualiza un servicio mensual existente."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_proveedor_access(
+            ServicioMensualService.listar_servicios_mensuales(),
+            usuario_autenticado,
+            cuit_proveedor,
+        )
         datos = json.loads(request.body)
         if "proveedor" in datos:
             datos["proveedor_id"] = datos.pop("proveedor")
+            ensure_proveedor_access(
+                ServicioMensualService.listar_servicios_mensuales(),
+                usuario_autenticado,
+                datos["proveedor_id"],
+            )
         sm = ServicioMensualService.actualizar_servicio_mensual(cuit_proveedor, datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Servicio mensual actualizado exitosamente",
-            "data": {
-                "cuit": str(sm.proveedor.cuit),
-                "numero_cuenta": sm.numero_cuenta,
-            }
-        })
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "cuit": str(sm.proveedor.cuit),
+            "numero_cuenta": sm.numero_cuenta,
+        }, message="Servicio mensual actualizado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(
+            e,
+            validation_message="Error de validación al actualizar servicio mensual.",
+            not_found_message="Servicio mensual no encontrado.",
+        )
 
 
 @csrf_exempt
@@ -129,13 +119,13 @@ def actualizar_servicio_mensual(request, cuit_proveedor):
 def eliminar_servicio_mensual(request, cuit_proveedor):
     """Elimina un servicio mensual."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_proveedor_access(
+            ServicioMensualService.listar_servicios_mensuales(),
+            usuario_autenticado,
+            cuit_proveedor,
+        )
         ServicioMensualService.eliminar_servicio_mensual(cuit_proveedor)
-        return JsonResponse({
-            "status": "success",
-            "message": "Servicio mensual eliminado exitosamente",
-        })
+        return success_response(message="Servicio mensual eliminado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(e, not_found_message="Servicio mensual no encontrado.")

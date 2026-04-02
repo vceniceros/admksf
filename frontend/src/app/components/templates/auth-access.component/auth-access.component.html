@@ -3,10 +3,7 @@
     <div class="auth-hero-copy">
       <span class="auth-kicker">Consorcio 360</span>
       <h1>Acceso administrativo para operar liquidaciones, pagos y gestión del consorcio.</h1>
-      <p>
-        El frontend se conecta con el backend Django para autenticar usuarios, obtener el JWT y sostener la sesión
-        protegida antes de entrar al menú de consorcios.
-      </p>
+      <p>Centralizá las liquidaciones de expensas, automatizá el pago a proveedores y llevá el control financiero de todos tus edificios desde una única plataforma en la nube.</p>
     </div>
 
     <div class="auth-hero-metrics">
@@ -26,20 +23,6 @@
   </div>
 
   <div class="auth-card">
-    <app-auth-mode-toggle [mode]="mode" (modeChange)="setMode($event)"></app-auth-mode-toggle>
-
-    <app-auth-feedback-card
-      *ngIf="registerSuccessEmail"
-      title="Cuenta creada correctamente"
-      [description]="'Ya podés iniciar sesión con ' + registerSuccessEmail + '.'"
-      tone="success"
-    ></app-auth-feedback-card>
-
-    <app-login-form *ngIf="mode === 'login'" (switchMode)="setMode('register')"></app-login-form>
-    <app-register-form
-      *ngIf="mode === 'register'"
-      (switchMode)="setMode('login')"
-      (registrationCompleted)="handleRegistrationCompleted($event)"
-    ></app-register-form>
+    <app-login-form></app-login-form>
   </div>
 </section>

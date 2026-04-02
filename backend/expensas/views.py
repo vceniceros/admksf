@@ -7,9 +7,11 @@ Fecha:
 import json
 
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+from shared.api_responses import exception_response, success_response
+from shared.auth import ensure_consorcio_access, filter_queryset_by_consorcios, get_request_user
 
 from .services import LiquidacionService
 from .models import ExpensaTemplate
@@ -35,14 +37,24 @@ def liquidar_expensa(request):
     """
 
     try:
+        usuario_autenticado = get_request_user(request)
         payload = json.loads(request.body)
+        consorcio_id = payload.get("consorcio")
+        ensure_consorcio_access(usuario_autenticado, consorcio_id)
+
+        template_id = payload.get("template_id")
+        if template_id:
+            template = ExpensaTemplate.objects.get(pk=template_id)
+            if template.consorcio_id:
+                ensure_consorcio_access(usuario_autenticado, template.consorcio_id)
+                if consorcio_id and template.consorcio_id != consorcio_id:
+                    raise ValidationError("El template no pertenece al consorcio indicado.")
+
         resultado = LiquidacionService.liquidar(payload)
         status_code = 201 if payload.get("cerrar") else 200
-        return JsonResponse({"status": "success", "data": resultado}, status=status_code)
-    except ValidationError as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=400)
+        return success_response(resultado, status=status_code)
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc, validation_message="Error de validación al liquidar expensas.")
 
 
 @csrf_exempt
@@ -54,9 +66,11 @@ def listar_templates(request):
     """
 
     try:
+        usuario_autenticado = get_request_user(request)
         consorcio = request.GET.get("consorcio")
-        queryset = ExpensaTemplate.objects.all()
+        queryset = filter_queryset_by_consorcios(ExpensaTemplate.objects.all(), usuario_autenticado)
         if consorcio:
+            ensure_consorcio_access(usuario_autenticado, consorcio)
             queryset = queryset.filter(consorcio_id=consorcio)
         templates = [
             {
@@ -68,9 +82,9 @@ def listar_templates(request):
             }
             for template in queryset.order_by("-creado_en")
         ]
-        return JsonResponse({"status": "success", "data": templates})
+        return success_response(templates)
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc)
 
 
 @csrf_exempt
@@ -78,6 +92,8 @@ def listar_templates(request):
 def listar_templates_por_consorcio(request, cuit_consorcio):
     """Lista templates de expensa por consorcio."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_consorcio_access(usuario_autenticado, cuit_consorcio)
         queryset = ExpensaTemplate.objects.filter(consorcio_id=cuit_consorcio)
         templates = [
             {
@@ -89,9 +105,9 @@ def listar_templates_por_consorcio(request, cuit_consorcio):
             }
             for template in queryset.order_by("-creado_en")
         ]
-        return JsonResponse({"status": "success", "data": templates})
+        return success_response(templates)
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc)
 
 
 @csrf_exempt
@@ -100,7 +116,9 @@ def crear_template(request):
     """Crea un template de expensa."""
 
     try:
+        usuario_autenticado = get_request_user(request)
         payload = json.loads(request.body)
+        ensure_consorcio_access(usuario_autenticado, payload.get("consorcio"))
         template = ExpensaTemplate.objects.create(
             consorcio_id=payload.get("consorcio"),
             nombre=payload.get("nombre"),
@@ -108,21 +126,18 @@ def crear_template(request):
             config=payload.get("config", {}),
             activo=payload.get("activo", True),
         )
-        return JsonResponse(
+        return success_response(
             {
-                "status": "success",
-                "data": {
-                    "id": template.id_expensa_template,
-                    "consorcio": template.consorcio_id,
-                    "nombre": template.nombre,
-                    "version": template.version,
-                    "activo": template.activo,
-                },
+                "id": template.id_expensa_template,
+                "consorcio": template.consorcio_id,
+                "nombre": template.nombre,
+                "version": template.version,
+                "activo": template.activo,
             },
             status=201,
         )
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc, validation_message="Error de validación al crear template de expensa.")
 
 
 @csrf_exempt
@@ -131,24 +146,22 @@ def obtener_template(request, template_id):
     """Obtiene un template de expensa por ID."""
 
     try:
+        usuario_autenticado = get_request_user(request)
         template = ExpensaTemplate.objects.get(pk=template_id)
-        return JsonResponse(
+        if template.consorcio_id:
+            ensure_consorcio_access(usuario_autenticado, template.consorcio_id)
+        return success_response(
             {
-                "status": "success",
-                "data": {
-                    "id": template.id_expensa_template,
-                    "consorcio": template.consorcio_id,
-                    "nombre": template.nombre,
-                    "version": template.version,
-                    "activo": template.activo,
-                    "config": template.config,
-                },
+                "id": template.id_expensa_template,
+                "consorcio": template.consorcio_id,
+                "nombre": template.nombre,
+                "version": template.version,
+                "activo": template.activo,
+                "config": template.config,
             }
         )
-    except ExpensaTemplate.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Template no encontrado."}, status=404)
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc, not_found_message="Template no encontrado.")
 
 
 @csrf_exempt
@@ -157,8 +170,13 @@ def actualizar_template(request, template_id):
     """Actualiza un template de expensa."""
 
     try:
+        usuario_autenticado = get_request_user(request)
         payload = json.loads(request.body)
         template = ExpensaTemplate.objects.get(pk=template_id)
+        if template.consorcio_id:
+            ensure_consorcio_access(usuario_autenticado, template.consorcio_id)
+        if "consorcio" in payload:
+            ensure_consorcio_access(usuario_autenticado, payload.get("consorcio"))
         for field in ["consorcio", "nombre", "version", "config", "activo"]:
             if field in payload:
                 if field == "consorcio":
@@ -166,23 +184,22 @@ def actualizar_template(request, template_id):
                 else:
                     setattr(template, field, payload[field])
         template.save()
-        return JsonResponse(
+        return success_response(
             {
-                "status": "success",
-                "data": {
-                    "id": template.id_expensa_template,
-                    "consorcio": template.consorcio_id,
-                    "nombre": template.nombre,
-                    "version": template.version,
-                    "activo": template.activo,
-                    "config": template.config,
-                },
+                "id": template.id_expensa_template,
+                "consorcio": template.consorcio_id,
+                "nombre": template.nombre,
+                "version": template.version,
+                "activo": template.activo,
+                "config": template.config,
             }
         )
-    except ExpensaTemplate.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Template no encontrado."}, status=404)
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(
+            exc,
+            validation_message="Error de validación al actualizar template de expensa.",
+            not_found_message="Template no encontrado.",
+        )
 
 
 @csrf_exempt
@@ -191,10 +208,11 @@ def eliminar_template(request, template_id):
     """Elimina un template de expensa."""
 
     try:
+        usuario_autenticado = get_request_user(request)
         template = ExpensaTemplate.objects.get(pk=template_id)
+        if template.consorcio_id:
+            ensure_consorcio_access(usuario_autenticado, template.consorcio_id)
         template.delete()
-        return JsonResponse({"status": "success", "message": "Template eliminado."})
-    except ExpensaTemplate.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Template no encontrado."}, status=404)
+        return success_response(message="Template eliminado.")
     except Exception as exc:
-        return JsonResponse({"status": "error", "message": str(exc)}, status=500)
+        return exception_response(exc, not_found_message="Template no encontrado.")

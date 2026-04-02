@@ -4,11 +4,12 @@ Fecha:
     31 - 01 - 2026
 """
 
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from shared.api_responses import exception_response, success_response
+from shared.auth import ensure_proveedor_access, filter_proveedores_queryset, get_request_user
 
 from .services import ProveedorService
 
@@ -33,24 +34,12 @@ def crear_proveedor(request):
     try:
         datos = json.loads(request.body)
         proveedor = ProveedorService.crear_proveedor(datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Proveedor creado exitosamente",
-            "data": {
-                "cuit": str(proveedor.cuit),
-                "razon_social": proveedor.razon_social,
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "cuit": str(proveedor.cuit),
+            "razon_social": proveedor.razon_social,
+        }, message="Proveedor creado exitosamente", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear proveedor.")
 
 
 @csrf_exempt
@@ -58,26 +47,25 @@ def crear_proveedor(request):
 def obtener_proveedor(request, cuit):
     """Obtiene un proveedor específico."""
     try:
-        proveedor = ProveedorService.obtener_proveedor(cuit)
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "cuit": str(proveedor.cuit),
-                "razon_social": proveedor.razon_social,
-                "telefono": proveedor.telefono,
-                "email": proveedor.email,
-                "calle": proveedor.calle,
-                "numero": proveedor.numero,
-                "codigo_postal": proveedor.codigo_postal,
-                "ciudad": proveedor.ciudad,
-                "tipo_proveedor": proveedor.tipo_proveedor,
-            }
+        usuario_autenticado = get_request_user(request)
+        proveedor = ensure_proveedor_access(
+            ProveedorService.listar_proveedores(),
+            usuario_autenticado,
+            cuit,
+        )
+        return success_response({
+            "cuit": str(proveedor.cuit),
+            "razon_social": proveedor.razon_social,
+            "telefono": proveedor.telefono,
+            "email": proveedor.email,
+            "calle": proveedor.calle,
+            "numero": proveedor.numero,
+            "codigo_postal": proveedor.codigo_postal,
+            "ciudad": proveedor.ciudad,
+            "tipo_proveedor": proveedor.tipo_proveedor,
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Proveedor no encontrado: {str(e)}",
-        }, status=404)
+        return exception_response(e, not_found_message="Proveedor no encontrado.")
 
 
 @csrf_exempt
@@ -85,23 +73,20 @@ def obtener_proveedor(request, cuit):
 def listar_proveedores(request):
     """Lista todos los proveedores."""
     try:
-        proveedores = ProveedorService.listar_proveedores()
+        usuario_autenticado = get_request_user(request)
+        proveedores = filter_proveedores_queryset(
+            ProveedorService.listar_proveedores(),
+            usuario_autenticado,
+        )
         datos = [{
             "cuit": str(p.cuit),
             "razon_social": p.razon_social,
             "ciudad": p.ciudad,
             "tipo_proveedor": p.tipo_proveedor,
         } for p in proveedores]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -109,23 +94,20 @@ def listar_proveedores(request):
 def listar_proveedores_por_tipo(request, tipo_proveedor):
     """Lista proveedores por tipo."""
     try:
-        proveedores = ProveedorService.listar_proveedores_por_tipo(tipo_proveedor)
+        usuario_autenticado = get_request_user(request)
+        proveedores = filter_proveedores_queryset(
+            ProveedorService.listar_proveedores_por_tipo(tipo_proveedor),
+            usuario_autenticado,
+        )
         datos = [{
             "cuit": str(p.cuit),
             "razon_social": p.razon_social,
             "ciudad": p.ciudad,
             "tipo_proveedor": p.tipo_proveedor,
         } for p in proveedores]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -133,26 +115,24 @@ def listar_proveedores_por_tipo(request, tipo_proveedor):
 def actualizar_proveedor(request, cuit):
     """Actualiza un proveedor existente."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_proveedor_access(
+            ProveedorService.listar_proveedores(),
+            usuario_autenticado,
+            cuit,
+        )
         datos = json.loads(request.body)
         proveedor = ProveedorService.actualizar_proveedor(cuit, datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Proveedor actualizado exitosamente",
-            "data": {
-                "cuit": str(proveedor.cuit),
-                "razon_social": proveedor.razon_social,
-            }
-        })
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "cuit": str(proveedor.cuit),
+            "razon_social": proveedor.razon_social,
+        }, message="Proveedor actualizado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(
+            e,
+            validation_message="Error de validación al actualizar proveedor.",
+            not_found_message="Proveedor no encontrado.",
+        )
 
 
 @csrf_exempt
@@ -160,13 +140,13 @@ def actualizar_proveedor(request, cuit):
 def eliminar_proveedor(request, cuit):
     """Elimina un proveedor."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_proveedor_access(
+            ProveedorService.listar_proveedores(),
+            usuario_autenticado,
+            cuit,
+        )
         ProveedorService.eliminar_proveedor(cuit)
-        return JsonResponse({
-            "status": "success",
-            "message": "Proveedor eliminado exitosamente",
-        })
+        return success_response(message="Proveedor eliminado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(e, not_found_message="Proveedor no encontrado.")

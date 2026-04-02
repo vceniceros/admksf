@@ -5,10 +5,12 @@ Fecha:
 """
 
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from shared.api_responses import exception_response, success_response
+from shared.auth import ensure_consorcio_access, filter_propietarios_queryset, filter_queryset_by_consorcios, get_request_user
 
 from .services import UnidadFuncionalService
 
@@ -28,30 +30,20 @@ def crear_unidad_funcional(request):
     }
     """
     try:
+        usuario_autenticado = get_request_user(request)
         datos = json.loads(request.body)
         if "consorcio" in datos:
             datos["consorcio_id"] = datos.pop("consorcio")
         if "propietario" in datos:
             datos["propietario_id"] = datos.pop("propietario")
+        ensure_consorcio_access(usuario_autenticado, datos.get("consorcio_id"))
         unidad = UnidadFuncionalService.crear_unidad_funcional(datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Unidad funcional creada exitosamente",
-            "data": {
-                "numero": unidad.numero_de_unidad_funcional,
-                "tipo": unidad.tipo_de_unidad,
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "numero": unidad.numero_de_unidad_funcional,
+            "tipo": unidad.tipo_de_unidad,
+        }, message="Unidad funcional creada exitosamente", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear unidad funcional.")
 
 
 @csrf_exempt
@@ -59,23 +51,19 @@ def crear_unidad_funcional(request):
 def obtener_unidad_funcional(request, numero):
     """Obtiene una unidad funcional específica."""
     try:
+        usuario_autenticado = get_request_user(request)
         unidad = UnidadFuncionalService.obtener_unidad_funcional(numero)
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "numero": unidad.numero_de_unidad_funcional,
-                "consorcio": str(unidad.consorcio.cuit),
-                "tipo_de_unidad": unidad.tipo_de_unidad,
-                "estado_de_vivienda": unidad.estado_de_vivienda,
-                "superficie": str(unidad.superficie),
-                "propietario": str(unidad.propietario.dni) if unidad.propietario else None,
-            }
+        ensure_consorcio_access(usuario_autenticado, unidad.consorcio_id)
+        return success_response({
+            "numero": unidad.numero_de_unidad_funcional,
+            "consorcio": str(unidad.consorcio.cuit),
+            "tipo_de_unidad": unidad.tipo_de_unidad,
+            "estado_de_vivienda": unidad.estado_de_vivienda,
+            "superficie": str(unidad.superficie),
+            "propietario": str(unidad.propietario.dni) if unidad.propietario else None,
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Unidad funcional no encontrada: {str(e)}",
-        }, status=404)
+        return exception_response(e, not_found_message="Unidad funcional no encontrada.")
 
 
 @csrf_exempt
@@ -83,7 +71,11 @@ def obtener_unidad_funcional(request, numero):
 def listar_unidades_funcionales(request):
     """Lista todas las unidades funcionales."""
     try:
-        unidades = UnidadFuncionalService.listar_unidades_funcionales()
+        usuario_autenticado = get_request_user(request)
+        unidades = filter_queryset_by_consorcios(
+            UnidadFuncionalService.listar_unidades_funcionales(),
+            usuario_autenticado,
+        )
         datos = [{
             "numero": u.numero_de_unidad_funcional,
             "consorcio": str(u.consorcio.cuit),
@@ -92,16 +84,9 @@ def listar_unidades_funcionales(request):
             "superficie": str(u.superficie),
             "propietario": str(u.propietario.dni) if u.propietario else None,
         } for u in unidades]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -109,6 +94,8 @@ def listar_unidades_funcionales(request):
 def listar_unidades_por_consorcio(request, cuit_consorcio):
     """Lista unidades funcionales de un consorcio."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_consorcio_access(usuario_autenticado, cuit_consorcio)
         unidades = UnidadFuncionalService.listar_unidades_por_consorcio(cuit_consorcio)
         datos = [{
             "numero": u.numero_de_unidad_funcional,
@@ -118,16 +105,9 @@ def listar_unidades_por_consorcio(request, cuit_consorcio):
             "superficie": str(u.superficie),
             "propietario": str(u.propietario.dni) if u.propietario else None,
         } for u in unidades]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -135,7 +115,11 @@ def listar_unidades_por_consorcio(request, cuit_consorcio):
 def listar_unidades_por_propietario(request, dni_propietario):
     """Lista unidades funcionales de un propietario."""
     try:
-        unidades = UnidadFuncionalService.listar_unidades_por_propietario(dni_propietario)
+        usuario_autenticado = get_request_user(request)
+        unidades = filter_queryset_by_consorcios(
+            UnidadFuncionalService.listar_unidades_por_propietario(dni_propietario),
+            usuario_autenticado,
+        )
         datos = [{
             "numero": u.numero_de_unidad_funcional,
             "consorcio": str(u.consorcio.cuit),
@@ -144,16 +128,9 @@ def listar_unidades_por_propietario(request, dni_propietario):
             "superficie": str(u.superficie),
             "propietario": str(u.propietario.dni) if u.propietario else None,
         } for u in unidades]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -161,30 +138,28 @@ def listar_unidades_por_propietario(request, dni_propietario):
 def actualizar_unidad_funcional(request, numero):
     """Actualiza una unidad funcional existente."""
     try:
+        usuario_autenticado = get_request_user(request)
+        unidad_actual = UnidadFuncionalService.obtener_unidad_funcional(numero)
+        ensure_consorcio_access(usuario_autenticado, unidad_actual.consorcio_id)
+
         datos = json.loads(request.body)
         if "consorcio" in datos:
             datos["consorcio_id"] = datos.pop("consorcio")
         if "propietario" in datos:
             datos["propietario_id"] = datos.pop("propietario")
+        if datos.get("consorcio_id"):
+            ensure_consorcio_access(usuario_autenticado, datos.get("consorcio_id"))
         unidad = UnidadFuncionalService.actualizar_unidad_funcional(numero, datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Unidad funcional actualizada exitosamente",
-            "data": {
-                "numero": unidad.numero_de_unidad_funcional,
-                "tipo": unidad.tipo_de_unidad,
-            }
-        })
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "numero": unidad.numero_de_unidad_funcional,
+            "tipo": unidad.tipo_de_unidad,
+        }, message="Unidad funcional actualizada exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(
+            e,
+            validation_message="Error de validación al actualizar unidad funcional.",
+            not_found_message="Unidad funcional no encontrada.",
+        )
 
 
 @csrf_exempt
@@ -192,13 +167,10 @@ def actualizar_unidad_funcional(request, numero):
 def eliminar_unidad_funcional(request, numero):
     """Elimina una unidad funcional."""
     try:
+        usuario_autenticado = get_request_user(request)
+        unidad = UnidadFuncionalService.obtener_unidad_funcional(numero)
+        ensure_consorcio_access(usuario_autenticado, unidad.consorcio_id)
         UnidadFuncionalService.eliminar_unidad_funcional(numero)
-        return JsonResponse({
-            "status": "success",
-            "message": "Unidad funcional eliminada exitosamente",
-        })
+        return success_response(message="Unidad funcional eliminada exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(e, not_found_message="Unidad funcional no encontrada.")

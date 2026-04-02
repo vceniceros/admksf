@@ -8,6 +8,7 @@ import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
 import { UnitsTableComponent } from '../../molecules/units-table.component/units-table.component';
 import { ConsortiumService } from '../../../services/consortium.service';
+import { ApiErrorService } from '../../../services/api-error.service';
 
 @Component({
   selector: 'app-units',
@@ -40,6 +41,7 @@ export class Units implements OnInit {
     private route: ActivatedRoute,
     private unitsService: UnitsService,
     private consortiumService: ConsortiumService,
+    private apiErrorService: ApiErrorService,
     private fb: FormBuilder
   ) {
     this.form = this.fb.group({
@@ -162,7 +164,7 @@ export class Units implements OnInit {
           this.loadUnits();
         },
         error: (error) => {
-          const message = error?.error?.message || 'Error al actualizar unidad funcional.';
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar unidad funcional.');
           alert(message);
           console.error('Error updating unit:', error);
         }
@@ -181,7 +183,7 @@ export class Units implements OnInit {
         this.loadUnits();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al crear unidad funcional.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear unidad funcional.');
         alert(message);
         console.error('Error creating unit:', error);
       }
@@ -208,7 +210,7 @@ export class Units implements OnInit {
         this.loadUnits();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al eliminar unidad funcional.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al eliminar unidad funcional.');
         alert(message);
         console.error('Error deleting unit:', error);
       }

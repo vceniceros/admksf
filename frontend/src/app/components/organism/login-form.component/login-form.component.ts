@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, throwError } from 'rxjs';
@@ -26,8 +26,6 @@ export class LoginFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
-  @Output() switchMode = new EventEmitter<void>();
 
   readonly form = this.fb.group({
     usuario: ['', [Validators.required, Validators.email]],

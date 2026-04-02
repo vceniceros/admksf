@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, of, switchMap } from 'rxjs';
 import { ProvidersService } from '../../../services/providers.service';
+import { ApiErrorService } from '../../../services/api-error.service';
 import { Provider } from '../../../../models/provider.model';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
@@ -40,6 +41,7 @@ export class Providers implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private providersService: ProvidersService,
+    private apiErrorService: ApiErrorService,
     private fb: FormBuilder
   ) {
     this.form = this.fb.group({
@@ -180,7 +182,7 @@ export class Providers implements OnInit {
           this.syncSpecialization(cuit, tipo, this.originalTipo);
         },
         error: (error) => {
-          const message = error?.error?.message || 'Error al actualizar proveedor.';
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar proveedor.');
           alert(message);
           console.error('Error updating provider:', error);
         }
@@ -193,7 +195,7 @@ export class Providers implements OnInit {
         this.createSpecialization(cuit, tipo, raw);
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al crear proveedor.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear proveedor.');
         alert(message);
         console.error('Error creating provider:', error);
       }
@@ -212,7 +214,7 @@ export class Providers implements OnInit {
           this.loadProviders();
         },
         error: (error) => {
-          const message = error?.error?.message || 'Error al crear servicio mensual.';
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear servicio mensual.');
           alert(message);
           console.error('Error creating servicio mensual:', error);
         }
@@ -229,7 +231,7 @@ export class Providers implements OnInit {
         this.loadProviders();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al crear mantenimiento.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear mantenimiento.');
         alert(message);
         console.error('Error creating mantenimiento:', error);
       }
@@ -264,7 +266,7 @@ export class Providers implements OnInit {
           this.loadProviders();
         },
         error: (error) => {
-          const message = error?.error?.message || 'Error al actualizar servicio mensual.';
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar servicio mensual.');
           alert(message);
           console.error('Error updating servicio mensual:', error);
         }
@@ -285,7 +287,7 @@ export class Providers implements OnInit {
         this.loadProviders();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al actualizar mantenimiento.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar mantenimiento.');
         alert(message);
         console.error('Error updating mantenimiento:', error);
       }
@@ -331,7 +333,7 @@ export class Providers implements OnInit {
         this.loadProviders();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al eliminar proveedor.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al eliminar proveedor.');
         alert(message);
         console.error('Error deleting provider:', error);
       }

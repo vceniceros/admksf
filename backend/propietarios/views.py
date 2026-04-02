@@ -4,11 +4,12 @@ Fecha:
     31 - 01 - 2026
 """
 
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from shared.api_responses import exception_response, success_response
+from shared.auth import ensure_propietario_access, filter_propietarios_queryset, get_request_user
 
 from .services import PropietarioService
 
@@ -29,25 +30,13 @@ def crear_propietario(request):
     try:
         datos = json.loads(request.body)
         propietario = PropietarioService.crear_propietario(datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Propietario creado exitosamente",
-            "data": {
-                "dni": str(propietario.dni),
-                "nombre": propietario.nombre,
-                "apellido": propietario.apellido,
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "dni": str(propietario.dni),
+            "nombre": propietario.nombre,
+            "apellido": propietario.apellido,
+        }, message="Propietario creado exitosamente", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear propietario.")
 
 
 @csrf_exempt
@@ -55,22 +44,21 @@ def crear_propietario(request):
 def obtener_propietario(request, dni):
     """Obtiene un propietario específico."""
     try:
-        propietario = PropietarioService.obtener_propietario(dni)
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "dni": str(propietario.dni),
-                "nombre": propietario.nombre,
-                "apellido": propietario.apellido,
-                "telefono": propietario.telefono,
-                "email": propietario.email,
-            }
+        usuario_autenticado = get_request_user(request)
+        propietario = ensure_propietario_access(
+            PropietarioService.listar_propietarios(),
+            usuario_autenticado,
+            dni,
+        )
+        return success_response({
+            "dni": str(propietario.dni),
+            "nombre": propietario.nombre,
+            "apellido": propietario.apellido,
+            "telefono": propietario.telefono,
+            "email": propietario.email,
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Propietario no encontrado: {str(e)}",
-        }, status=404)
+        return exception_response(e, not_found_message="Propietario no encontrado.")
 
 
 @csrf_exempt
@@ -78,7 +66,11 @@ def obtener_propietario(request, dni):
 def listar_propietarios(request):
     """Lista todos los propietarios."""
     try:
-        propietarios = PropietarioService.listar_propietarios()
+        usuario_autenticado = get_request_user(request)
+        propietarios = filter_propietarios_queryset(
+            PropietarioService.listar_propietarios(),
+            usuario_autenticado,
+        )
         datos = [{
             "dni": str(p.dni),
             "nombre": p.nombre,
@@ -86,16 +78,9 @@ def listar_propietarios(request):
             "telefono": p.telefono,
             "email": p.email,
         } for p in propietarios]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -103,27 +88,25 @@ def listar_propietarios(request):
 def actualizar_propietario(request, dni):
     """Actualiza un propietario existente."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_propietario_access(
+            PropietarioService.listar_propietarios(),
+            usuario_autenticado,
+            dni,
+        )
         datos = json.loads(request.body)
         propietario = PropietarioService.actualizar_propietario(dni, datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Propietario actualizado exitosamente",
-            "data": {
-                "dni": str(propietario.dni),
-                "nombre": propietario.nombre,
-                "apellido": propietario.apellido,
-            }
-        })
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "dni": str(propietario.dni),
+            "nombre": propietario.nombre,
+            "apellido": propietario.apellido,
+        }, message="Propietario actualizado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(
+            e,
+            validation_message="Error de validación al actualizar propietario.",
+            not_found_message="Propietario no encontrado.",
+        )
 
 
 @csrf_exempt
@@ -131,13 +114,13 @@ def actualizar_propietario(request, dni):
 def eliminar_propietario(request, dni):
     """Elimina un propietario."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_propietario_access(
+            PropietarioService.listar_propietarios(),
+            usuario_autenticado,
+            dni,
+        )
         PropietarioService.eliminar_propietario(dni)
-        return JsonResponse({
-            "status": "success",
-            "message": "Propietario eliminado exitosamente",
-        })
+        return success_response(message="Propietario eliminado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(e, not_found_message="Propietario no encontrado.")

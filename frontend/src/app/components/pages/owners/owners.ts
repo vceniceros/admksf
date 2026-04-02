@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OwnersService } from '../../../services/owners.service';
+import { ApiErrorService } from '../../../services/api-error.service';
 import { Owner } from '../../../../models/owner.model';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
@@ -35,6 +36,7 @@ export class Owners implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private ownersService: OwnersService,
+    private apiErrorService: ApiErrorService,
     private fb: FormBuilder
   ) {
     this.form = this.fb.group({
@@ -134,7 +136,7 @@ export class Owners implements OnInit {
           this.loadOwners();
         },
         error: (error) => {
-          const message = error?.error?.message || 'Error al actualizar propietario.';
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar propietario.');
           alert(message);
           console.error('Error updating owner:', error);
         }
@@ -153,7 +155,7 @@ export class Owners implements OnInit {
         this.loadOwners();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al crear propietario.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear propietario.');
         alert(message);
         console.error('Error creating owner:', error);
       }
@@ -180,7 +182,7 @@ export class Owners implements OnInit {
         this.loadOwners();
       },
       error: (error) => {
-        const message = error?.error?.message || 'Error al eliminar propietario.';
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al eliminar propietario.');
         alert(message);
         console.error('Error deleting owner:', error);
       }

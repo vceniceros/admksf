@@ -8,6 +8,7 @@ import { IconComponent } from '../../atoms/icon.component/icon.component';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { ConsortiumStatus } from '../../../../models/consortium.model';
 import { ConsortiumService } from '../../../services/consortium.service';
+import { ApiErrorService } from '../../../services/api-error.service';
 import { DropZone } from '../../molecules/drop-zone/drop-zone';
 import { FilePreview } from '../../molecules/file-preview/file-preview';
 
@@ -41,7 +42,8 @@ export class ConsortiumGridComponent {
 
   constructor(
     private fb: FormBuilder,
-    private consortiumService: ConsortiumService
+    private consortiumService: ConsortiumService,
+    private apiErrorService: ApiErrorService
   ) {
     this.form = this.fb.group({
       cuit: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
@@ -90,7 +92,7 @@ export class ConsortiumGridComponent {
               this.consortiumCreated.emit();
             },
             error: (error: any) => {
-              alert('Error al subir la imagen.');
+              alert(this.apiErrorService.extractDetailedMessage(error, 'Error al subir la imagen.'));
               console.error('Error al subir la imagen:', error);
             }
           });
@@ -100,7 +102,7 @@ export class ConsortiumGridComponent {
         this.consortiumCreated.emit();
       },
       error: (error: any) => {
-        const message = this.getErrorMessage(error, 'Error al crear consorcio.');
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al crear consorcio.');
         alert(message);
         console.error('Error al crear consorcio:', error);
       }
@@ -141,22 +143,10 @@ export class ConsortiumGridComponent {
         this.consortiumDeleted.emit();
       },
       error: (error: any) => {
-        const message = this.getErrorMessage(error, 'Error al eliminar consorcio.');
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al eliminar consorcio.');
         alert(message);
         console.error('Error al eliminar consorcio:', error);
       }
     });
-  }
-
-  private getErrorMessage(error: any, fallback: string): string {
-    const apiMessage = error?.error?.message || error?.message;
-    const apiErrors = error?.error?.errors;
-    if (apiErrors && typeof apiErrors === 'object') {
-      const details = Object.entries(apiErrors)
-        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : String(messages)}`)
-        .join(' | ');
-      return `${apiMessage || fallback} (${details})`;
-    }
-    return apiMessage || fallback;
   }
 }

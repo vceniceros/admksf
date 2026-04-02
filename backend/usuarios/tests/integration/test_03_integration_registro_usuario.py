@@ -9,6 +9,17 @@ from usuarios.models import Rol, Usuario
 
 
 class TestUsuarioIntegration(TestCase):
+    def setUp(self):
+        rol_super = Rol.objects.get(nombre="superusuario")
+        self.superusuario = Usuario.objects.create(
+            correo_electronico="root@test.com",
+            contrasena="clave123",
+            nombre="Root",
+            apellido="Admin",
+            rol=rol_super,
+        )
+        self.superusuario_token = AuthService.generate_jwt(self.superusuario)
+
     def test_01_registra_usuario_por_endpoint(self):
         payload = {
             "correo_electronico": "admin@test.com",
@@ -23,6 +34,7 @@ class TestUsuarioIntegration(TestCase):
             "/api/usuarios/registrar/",
             data=json.dumps(payload),
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.superusuario_token}",
         )
 
         self.assertEqual(response.status_code, 201)
@@ -39,6 +51,7 @@ class TestUsuarioIntegration(TestCase):
             "/api/usuarios/registrar/",
             data="{json_invalido",
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.superusuario_token}",
         )
 
         self.assertEqual(response.status_code, 400)
@@ -56,9 +69,27 @@ class TestUsuarioIntegration(TestCase):
             "/api/usuarios/registrar/",
             data=json.dumps(payload),
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.superusuario_token}",
         )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_03b_registro_requiere_autenticacion(self):
+        response = self.client.post(
+            "/api/usuarios/registrar/",
+            data=json.dumps(
+                {
+                    "correo_electronico": "sin-auth@test.com",
+                    "contrasena": "clave123",
+                    "nombre": "No",
+                    "apellido": "Auth",
+                    "rol": "administrador",
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 401)
 
     def test_04_login_usuario_por_endpoint(self):
         rol = Rol.objects.get(nombre="administrador")

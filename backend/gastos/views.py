@@ -8,10 +8,12 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from shared.api_responses import exception_response, success_response, validation_error_response
+from shared.auth import ensure_consorcio_access, filter_queryset_by_consorcios, get_request_user
 
 from .services import GastoService
 from shared.utils import process_file
@@ -33,30 +35,20 @@ def crear_gasto(request):
     }
     """
     try:
+        usuario_autenticado = get_request_user(request)
         datos = json.loads(request.body)
         if "consorcio" in datos:
             datos["consorcio_id"] = datos.pop("consorcio")
         if "proveedor" in datos:
             datos["proveedor_id"] = datos.pop("proveedor")
+        ensure_consorcio_access(usuario_autenticado, datos.get("consorcio_id"))
         gasto = GastoService.crear_gasto(datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Gasto creado exitosamente",
-            "data": {
-                "id": gasto.id_gasto,
-                "monto": str(gasto.monto),
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "id": gasto.id_gasto,
+            "monto": str(gasto.monto),
+        }, message="Gasto creado exitosamente", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear gasto.")
 
 
 @csrf_exempt
@@ -64,26 +56,22 @@ def crear_gasto(request):
 def obtener_gasto(request, id_gasto):
     """Obtiene un gasto específico."""
     try:
+        usuario_autenticado = get_request_user(request)
         gasto = GastoService.obtener_gasto(id_gasto)
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "id": gasto.id_gasto,
-                "consorcio": str(gasto.consorcio.cuit),
-                "proveedor": str(gasto.proveedor.cuit),
-                "periodo": str(gasto.periodo),
-                "descripcion": gasto.descripcion,
-                "monto": str(gasto.monto),
-                "fecha_registro": gasto.fecha_registro.isoformat(),
-                "tipo_gasto": gasto.tipo_gasto,
-                "estado_pago": gasto.estado_pago,
-            }
+        ensure_consorcio_access(usuario_autenticado, gasto.consorcio_id)
+        return success_response({
+            "id": gasto.id_gasto,
+            "consorcio": str(gasto.consorcio.cuit),
+            "proveedor": str(gasto.proveedor.cuit),
+            "periodo": str(gasto.periodo),
+            "descripcion": gasto.descripcion,
+            "monto": str(gasto.monto),
+            "fecha_registro": gasto.fecha_registro.isoformat(),
+            "tipo_gasto": gasto.tipo_gasto,
+            "estado_pago": gasto.estado_pago,
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": f"Gasto no encontrado: {str(e)}",
-        }, status=404)
+        return exception_response(e, not_found_message="Gasto no encontrado.")
 
 
 @csrf_exempt
@@ -91,7 +79,8 @@ def obtener_gasto(request, id_gasto):
 def listar_gastos(request):
     """Lista todos los gastos."""
     try:
-        gastos = GastoService.listar_gastos()
+        usuario_autenticado = get_request_user(request)
+        gastos = filter_queryset_by_consorcios(GastoService.listar_gastos(), usuario_autenticado)
         datos = [{
             "id": g.id_gasto,
             "consorcio": str(g.consorcio.cuit),
@@ -103,16 +92,9 @@ def listar_gastos(request):
             "tipo_gasto": g.tipo_gasto,
             "estado_pago": g.estado_pago,
         } for g in gastos]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -120,6 +102,8 @@ def listar_gastos(request):
 def listar_gastos_por_consorcio(request, cuit_consorcio):
     """Lista gastos de un consorcio."""
     try:
+        usuario_autenticado = get_request_user(request)
+        ensure_consorcio_access(usuario_autenticado, cuit_consorcio)
         gastos = GastoService.listar_gastos_por_consorcio(cuit_consorcio)
         datos = [{
             "id": g.id_gasto,
@@ -132,16 +116,9 @@ def listar_gastos_por_consorcio(request, cuit_consorcio):
             "estado_pago": g.estado_pago,
             "fecha_registro": g.fecha_registro.isoformat(),
         } for g in gastos]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -149,7 +126,11 @@ def listar_gastos_por_consorcio(request, cuit_consorcio):
 def listar_gastos_por_proveedor(request, cuit_proveedor):
     """Lista gastos de un proveedor."""
     try:
-        gastos = GastoService.listar_gastos_por_proveedor(cuit_proveedor)
+        usuario_autenticado = get_request_user(request)
+        gastos = filter_queryset_by_consorcios(
+            GastoService.listar_gastos_por_proveedor(cuit_proveedor),
+            usuario_autenticado,
+        )
         datos = [{
             "id": g.id_gasto,
             "consorcio": str(g.consorcio.cuit),
@@ -161,16 +142,9 @@ def listar_gastos_por_proveedor(request, cuit_proveedor):
             "estado_pago": g.estado_pago,
             "fecha_registro": g.fecha_registro.isoformat(),
         } for g in gastos]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -178,7 +152,11 @@ def listar_gastos_por_proveedor(request, cuit_proveedor):
 def listar_gastos_por_tipo(request, tipo_gasto):
     """Lista gastos por tipo."""
     try:
-        gastos = GastoService.listar_gastos_por_tipo(tipo_gasto)
+        usuario_autenticado = get_request_user(request)
+        gastos = filter_queryset_by_consorcios(
+            GastoService.listar_gastos_por_tipo(tipo_gasto),
+            usuario_autenticado,
+        )
         datos = [{
             "id": g.id_gasto,
             "consorcio": str(g.consorcio.cuit),
@@ -190,16 +168,9 @@ def listar_gastos_por_tipo(request, tipo_gasto):
             "estado_pago": g.estado_pago,
             "fecha_registro": g.fecha_registro.isoformat(),
         } for g in gastos]
-        return JsonResponse({
-            "status": "success",
-            "count": len(datos),
-            "data": datos
-        })
+        return success_response(datos, count=len(datos))
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e)
 
 
 @csrf_exempt
@@ -207,7 +178,11 @@ def listar_gastos_por_tipo(request, tipo_gasto):
 def listar_gastos_por_estado(request, estado_pago):
     """Lista gastos por estado de pago."""
     try:
-        gastos = GastoService.listar_gastos_por_estado(estado_pago)
+        usuario_autenticado = get_request_user(request)
+        gastos = filter_queryset_by_consorcios(
+            GastoService.listar_gastos_por_estado(estado_pago),
+            usuario_autenticado,
+        )
         datos = [{
             "id": g.id_gasto,
             "consorcio": str(g.consorcio.cuit),
@@ -236,30 +211,28 @@ def listar_gastos_por_estado(request, estado_pago):
 def actualizar_gasto(request, id_gasto):
     """Actualiza un gasto existente."""
     try:
+        usuario_autenticado = get_request_user(request)
+        gasto_actual = GastoService.obtener_gasto(id_gasto)
+        ensure_consorcio_access(usuario_autenticado, gasto_actual.consorcio_id)
+
         datos = json.loads(request.body)
         if "consorcio" in datos:
             datos["consorcio_id"] = datos.pop("consorcio")
         if "proveedor" in datos:
             datos["proveedor_id"] = datos.pop("proveedor")
+        if datos.get("consorcio_id"):
+            ensure_consorcio_access(usuario_autenticado, datos.get("consorcio_id"))
         gasto = GastoService.actualizar_gasto(id_gasto, datos)
-        return JsonResponse({
-            "status": "success",
-            "message": "Gasto actualizado exitosamente",
-            "data": {
-                "id": gasto.id_gasto,
-                "monto": str(gasto.monto),
-            }
-        })
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "id": gasto.id_gasto,
+            "monto": str(gasto.monto),
+        }, message="Gasto actualizado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(
+            e,
+            validation_message="Error de validación al actualizar gasto.",
+            not_found_message="Gasto no encontrado.",
+        )
 
 
 @csrf_exempt
@@ -278,12 +251,13 @@ def cargar_gasto_desde_archivo(request):
         estado_pago: string [opcional]
     """
     try:
+        usuario_autenticado = get_request_user(request)
         archivo = request.FILES.get("archivo")
         if not archivo:
-            return JsonResponse({
-                "status": "error",
-                "message": "No se proporcionó ningún archivo.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al procesar el archivo.",
+                ValidationError({"archivo": ["No se proporcionó ningún archivo."]}),
+            )
 
         extraidos = process_file(archivo)
 
@@ -296,34 +270,35 @@ def cargar_gasto_desde_archivo(request):
         estado_pago = request.POST.get("estado_pago")
 
         if not consorcio:
-            return JsonResponse({
-                "status": "error",
-                "message": "El campo consorcio es obligatorio.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"consorcio": ["El campo consorcio es obligatorio."]}),
+            )
+        ensure_consorcio_access(usuario_autenticado, consorcio)
         if not proveedor:
-            return JsonResponse({
-                "status": "error",
-                "message": "No se pudo determinar el proveedor.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"proveedor": ["No se pudo determinar el proveedor."]}),
+            )
         if not monto:
-            return JsonResponse({
-                "status": "error",
-                "message": "No se pudo determinar el monto.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"monto": ["No se pudo determinar el monto."]}),
+            )
         if not periodo:
-            return JsonResponse({
-                "status": "error",
-                "message": "No se pudo determinar el periodo.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"periodo": ["No se pudo determinar el periodo."]}),
+            )
 
         try:
             monto_normalizado = str(monto).replace(".", "").replace(",", ".")
             monto_decimal = Decimal(monto_normalizado)
         except (InvalidOperation, AttributeError):
-            return JsonResponse({
-                "status": "error",
-                "message": "El monto no es válido.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"monto": ["El monto no es válido."]}),
+            )
 
         try:
             if isinstance(periodo, str) and "/" in periodo and len(periodo) == 7:
@@ -333,10 +308,10 @@ def cargar_gasto_desde_archivo(request):
             else:
                 periodo_fecha = datetime.strptime(periodo, "%Y-%m-%d").date()
         except (ValueError, TypeError):
-            return JsonResponse({
-                "status": "error",
-                "message": "El periodo no tiene un formato válido.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al crear gasto desde archivo.",
+                ValidationError({"periodo": ["El periodo no tiene un formato válido."]}),
+            )
 
         datos_gasto = {
             "consorcio_id": consorcio,
@@ -352,24 +327,12 @@ def cargar_gasto_desde_archivo(request):
 
         gasto = GastoService.crear_gasto(datos_gasto)
 
-        return JsonResponse({
-            "status": "success",
-            "message": "Gasto creado exitosamente desde el archivo.",
-            "data": {
-                "id": gasto.id_gasto,
-                "monto": str(gasto.monto),
-            }
-        }, status=201)
-    except ValidationError as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e.messages),
-        }, status=400)
+        return success_response({
+            "id": gasto.id_gasto,
+            "monto": str(gasto.monto),
+        }, message="Gasto creado exitosamente desde el archivo.", status=201)
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al crear gasto desde archivo.")
 
 
 @csrf_exempt
@@ -377,30 +340,25 @@ def cargar_gasto_desde_archivo(request):
 def extraer_gasto_desde_archivo(request):
     """Extrae datos de un archivo (pdf o imagen) sin crear el gasto."""
     try:
+        get_request_user(request)
         archivo = request.FILES.get("archivo")
         if not archivo:
-            return JsonResponse({
-                "status": "error",
-                "message": "No se proporcionó ningún archivo.",
-            }, status=400)
+            return validation_error_response(
+                "Error de validación al extraer datos del archivo.",
+                ValidationError({"archivo": ["No se proporcionó ningún archivo."]}),
+            )
 
         extraidos = process_file(archivo)
         periodo = extraidos.get("periodo_facturado") or extraidos.get("fecha")
-        return JsonResponse({
-            "status": "success",
-            "data": {
-                "cuit_proveedor": extraidos.get("cuit_proveedor"),
-                "periodo": periodo,
-                "descripcion": extraidos.get("descripcion"),
-                "monto": extraidos.get("importe_total"),
-                "raw_text": extraidos.get("raw_text"),
-            }
+        return success_response({
+            "cuit_proveedor": extraidos.get("cuit_proveedor"),
+            "periodo": periodo,
+            "descripcion": extraidos.get("descripcion"),
+            "monto": extraidos.get("importe_total"),
+            "raw_text": extraidos.get("raw_text"),
         })
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=500)
+        return exception_response(e, validation_message="Error de validación al extraer datos del archivo.")
 
 
 @csrf_exempt
@@ -408,13 +366,10 @@ def extraer_gasto_desde_archivo(request):
 def eliminar_gasto(request, id_gasto):
     """Elimina un gasto."""
     try:
+        usuario_autenticado = get_request_user(request)
+        gasto = GastoService.obtener_gasto(id_gasto)
+        ensure_consorcio_access(usuario_autenticado, gasto.consorcio_id)
         GastoService.eliminar_gasto(id_gasto)
-        return JsonResponse({
-            "status": "success",
-            "message": "Gasto eliminado exitosamente",
-        })
+        return success_response(message="Gasto eliminado exitosamente")
     except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "message": str(e),
-        }, status=404)
+        return exception_response(e, not_found_message="Gasto no encontrado.")
