@@ -5,6 +5,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.sql
+!scripts/*.sql
 *.key
 *_private
 *_public
