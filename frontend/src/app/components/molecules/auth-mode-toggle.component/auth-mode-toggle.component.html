@@ -1,0 +1,18 @@
+<div class="auth-mode-toggle">
+  <button
+    type="button"
+    class="auth-mode-button"
+    [class.active]="mode === 'login'"
+    (click)="modeChange.emit('login')"
+  >
+    Ingresar
+  </button>
+  <button
+    type="button"
+    class="auth-mode-button"
+    [class.active]="mode === 'register'"
+    (click)="modeChange.emit('register')"
+  >
+    Registrarse
+  </button>
+</div>

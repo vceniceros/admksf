@@ -1,0 +1,4 @@
+<div class="auth-feedback-card" [class.success]="tone === 'success'" [class.error]="tone === 'error'">
+  <strong *ngIf="title">{{ title }}</strong>
+  <p>{{ description }}</p>
+</div>

@@ -69,6 +69,14 @@ class Consorcio(models.Model):
         null=True,
         blank=True,
     )
+    usuario = models.ForeignKey(
+        "usuarios.Usuario",
+        on_delete=models.PROTECT,
+        related_name="consorcios",
+        db_column="usuario_id",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         db_table = "consorcios"
@@ -125,5 +133,6 @@ class Consorcio(models.Model):
                 ("interes_por_mora", self.interes_por_mora, False),
                 ("redondeo_aumento", self.redondeo_aumento, False),
                 ("imagen_url", self.imagen_url, True),
+                ("usuario", self.usuario_id, True),
             ],
         )

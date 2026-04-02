@@ -2,9 +2,23 @@
   <div class="flex items-center gap-4">
     <img src="assets/img/logo-prueba.svg" alt="ConsorcioAdmin" class="navbar-logo">
   </div>
-<button 
-  *ngIf="showMenuButton"
-  class="block md:hidden bg-gray-200 px-4 py-2 rounded hover:bg-gray-400 text-gray-600"
-  (click)="onMenuClick()"> <app-icon iconHref="assets/img/sprites.svg#menu" size="24" color="#000000"></app-icon>
+  <div class="navbar-actions">
+    <div class="navbar-session" *ngIf="authService.user() as currentUser">
+      <span class="navbar-session-role">{{ currentUser.rol }}</span>
+      <strong>{{ currentUser.nombre }} {{ currentUser.apellido }}</strong>
+    </div>
+    <button
+      *ngIf="authService.isAuthenticated()"
+      class="navbar-logout"
+      type="button"
+      (click)="logout()"
+    >
+      Salir
+    </button>
+    <button 
+      *ngIf="showMenuButton"
+      class="block md:hidden bg-gray-200 px-4 py-2 rounded hover:bg-gray-400 text-gray-600"
+      (click)="onMenuClick()"> <app-icon iconHref="assets/img/sprites.svg#menu" size="24" color="#000000"></app-icon>
   </button>
+  </div>
 </header>

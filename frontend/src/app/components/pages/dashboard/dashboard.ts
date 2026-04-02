@@ -101,12 +101,12 @@ export class Dashboard implements OnInit {
             this.router.navigate(['/dashboard', nameForUrl], { replaceUrl: true });
           } else {
             // Si no hay consorcios activos, redirigir al menú
-            this.router.navigate(['/'], { replaceUrl: true });
+            this.router.navigate(['/consorcios'], { replaceUrl: true });
           }
         }
       },
       error: () => {
-        this.router.navigate(['/'], { replaceUrl: true });
+        this.router.navigate(['/consorcios'], { replaceUrl: true });
       }
     });
   }

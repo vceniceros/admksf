@@ -1,0 +1,42 @@
+<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="auth-form-header">
+    <h2>Ingresá a tu panel</h2>
+    <p>Validamos tu usuario contra Django y guardamos el JWT para sostener la sesión activa.</p>
+  </div>
+
+  <app-auth-field
+    label="Correo electrónico"
+    type="email"
+    inputMode="email"
+    autocomplete="username"
+    placeholder="admin@consorcio.com"
+    [value]="form.controls.usuario.value ?? ''"
+    [error]="getError('usuario')"
+    (valueChange)="updateField('usuario', $event)"
+    (blurInput)="touchField('usuario')"
+  ></app-auth-field>
+
+  <app-auth-field
+    label="Contraseña"
+    type="password"
+    autocomplete="current-password"
+    placeholder="Ingresá tu contraseña"
+    [value]="form.controls.contrasena.value ?? ''"
+    [error]="getError('contrasena')"
+    (valueChange)="updateField('contrasena', $event)"
+    (blurInput)="touchField('contrasena')"
+  ></app-auth-field>
+
+  <app-auth-feedback-card
+    *ngIf="submitError"
+    title="No pudimos validar el acceso"
+    [description]="submitError"
+    tone="error"
+  ></app-auth-feedback-card>
+
+  <app-auth-action-button label="Iniciar sesión" [loading]="isSubmitting"></app-auth-action-button>
+
+  <button type="button" class="auth-secondary-link" (click)="switchMode.emit()">
+    ¿Todavía no tenés usuario? Crear cuenta administrativa
+  </button>
+</form>

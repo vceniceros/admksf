@@ -74,7 +74,7 @@ export class ConsortiumForm implements OnInit {
     const formValue = this.form.value;
     if (this.isEditMode && this.consortiumId) {
       this.consortiumService.updateConsortium(this.consortiumId, formValue).subscribe({
-        next: () => this.router.navigate(['/']),
+        next: () => this.router.navigate(['/consorcios']),
         error: (error: any) => {
           alert('Error al actualizar consorcio.');
           console.error('Error al actualizar consorcio:', error);
@@ -84,7 +84,7 @@ export class ConsortiumForm implements OnInit {
     }
 
     this.consortiumService.createConsortium(formValue).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['/consorcios']),
       error: (error: any) => {
         const message = this.getErrorMessage(error, 'Error al crear consorcio.');
         alert(message);
@@ -94,7 +94,7 @@ export class ConsortiumForm implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/consorcios']);
   }
 
   private getErrorMessage(error: any, fallback: string): string {

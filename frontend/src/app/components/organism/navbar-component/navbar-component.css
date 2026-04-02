@@ -20,6 +20,47 @@
   width: auto;
 }
 
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-session {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.navbar-session-role {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0f766e;
+}
+
+.navbar-session strong {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.navbar-logout {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.navbar-logout:hover {
+  border-color: #94a3b8;
+}
+
 /* Tablet y Desktop */
 @media (min-width: 640px) {
   .navbar {
@@ -29,6 +70,10 @@
 
   .navbar-left {
     gap: 12px;
+  }
+
+  .navbar-session {
+    display: flex;
   }
 }
 

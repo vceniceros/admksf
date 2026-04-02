@@ -8,9 +8,44 @@
 .menu-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   margin-bottom: 24px;
   text-align: center;
+}
+
+.menu-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-user-card {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%);
+  border: 1px solid #bfdbfe;
+}
+
+.menu-user-role {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f766e;
+}
+
+.menu-user-card strong {
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.menu-user-card small {
+  font-size: 13px;
+  color: #475569;
 }
 
 .menu-title ::ng-deep span {
@@ -50,8 +85,16 @@
   }
 
   .menu-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
     text-align: left;
     margin-bottom: 40px;
+  }
+
+  .menu-user-card {
+    align-self: auto;
+    min-width: 260px;
   }
 
   .menu-title ::ng-deep span {

@@ -1,0 +1,45 @@
+<section class="auth-access-shell">
+  <div class="auth-hero-panel">
+    <div class="auth-hero-copy">
+      <span class="auth-kicker">Consorcio 360</span>
+      <h1>Acceso administrativo para operar liquidaciones, pagos y gestión del consorcio.</h1>
+      <p>
+        El frontend se conecta con el backend Django para autenticar usuarios, obtener el JWT y sostener la sesión
+        protegida antes de entrar al menú de consorcios.
+      </p>
+    </div>
+
+    <div class="auth-hero-metrics">
+      <article>
+        <strong>JWT backend</strong>
+        <span>Sesión firmada y validada por la API.</span>
+      </article>
+      <article>
+        <strong>Registro directo</strong>
+        <span>Alta de administradores desde la misma pantalla.</span>
+      </article>
+      <article>
+        <strong>Estructura atómica</strong>
+        <span>Átomos, moléculas, organismos y template alineados al proyecto.</span>
+      </article>
+    </div>
+  </div>
+
+  <div class="auth-card">
+    <app-auth-mode-toggle [mode]="mode" (modeChange)="setMode($event)"></app-auth-mode-toggle>
+
+    <app-auth-feedback-card
+      *ngIf="registerSuccessEmail"
+      title="Cuenta creada correctamente"
+      [description]="'Ya podés iniciar sesión con ' + registerSuccessEmail + '.'"
+      tone="success"
+    ></app-auth-feedback-card>
+
+    <app-login-form *ngIf="mode === 'login'" (switchMode)="setMode('register')"></app-login-form>
+    <app-register-form
+      *ngIf="mode === 'register'"
+      (switchMode)="setMode('login')"
+      (registrationCompleted)="handleRegistrationCompleted($event)"
+    ></app-register-form>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+<label class="auth-field">
+  <span class="auth-field-label">{{ label }}</span>
+  <app-auth-input
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value"
+    [autocomplete]="autocomplete"
+    [inputMode]="inputMode"
+    [disabled]="disabled"
+    (valueChange)="valueChange.emit($event)"
+    (blurInput)="blurInput.emit()"
+  ></app-auth-input>
+  <small class="auth-field-help" *ngIf="helpText && !error">{{ helpText }}</small>
+  <small class="auth-field-error" *ngIf="error">{{ error }}</small>
+</label>

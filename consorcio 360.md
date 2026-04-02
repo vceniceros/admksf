@@ -80,6 +80,15 @@ Representa la entidad principal del sistema. Sus campos clave son:
 * **CUIT:** Clave única de identificación tributaria (incluye validador de formato).
 * **Email:** Contacto administrativo.
 * **Imagen URL:** Referencia a los logos o fotos del consorcio almacenados digitalmente.
+* **Usuario administrador:** Relación hacia un usuario del dominio para permitir que un mismo usuario gestione múltiples consorcios.
+
+### Modelo: Usuario y Rol
+
+El backend incorpora un modelo de usuario administrativo propio, separado del usuario interno de Django Admin. Sus campos principales son correo electrónico, contraseña hasheada, timestamp de último ingreso, estado de activación, nombre, apellido y una relación con la tabla de roles.
+
+Roles iniciales del dominio:
+* **superusuario**
+* **administrador**
 
 ### Flujo de Datos de Facturación
 

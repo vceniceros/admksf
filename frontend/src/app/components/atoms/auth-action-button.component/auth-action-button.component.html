@@ -1,0 +1,4 @@
+<button class="auth-action-button" type="submit" [disabled]="disabled || loading">
+  <span *ngIf="!loading">{{ label }}</span>
+  <span *ngIf="loading">Procesando...</span>
+</button>

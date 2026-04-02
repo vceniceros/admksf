@@ -1,15 +1,12 @@
 import { Component, signal, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd, NavigationStart, NavigationCancel, NavigationError } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { IconComponent } from './components/atoms/icon.component/icon.component';
-import { GenericButtonComponent } from './components/atoms/generic-button.component/generic-button.component';
-import { ButtonWithIconComponent } from './components/molecules/button-with-icon.component/button-with-icon.component';
-import { LabelComponent } from './components/atoms/label.component/label.component';
+import { take } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { NavbarItemComponent } from './components/molecules/navbar-item.component/navbar-item.component';
 import { NavbarComponent } from './components/organism/navbar-component/navbar-component';
 import { SidebarComponent } from './components/organism/sidebar.component/sidebar.component';
 import { FooterComponent } from './components/organism/footer.component/footer.component';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +32,7 @@ import { FooterComponent } from './components/organism/footer.component/footer.c
     </div>
   `,
   styleUrl: './app.css',
-  imports: [RouterOutlet, IconComponent, GenericButtonComponent, ButtonWithIconComponent, LabelComponent, CommonModule, NavbarItemComponent, NavbarComponent, SidebarComponent, FooterComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, SidebarComponent, FooterComponent],
   standalone: true
 })
 export class App implements OnInit {
@@ -45,9 +42,14 @@ export class App implements OnInit {
   isLoading = true;
   private pendingNavigation = 0;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
+    this.authService.bootstrapSession().pipe(take(1)).subscribe();
+
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.pendingNavigation += 1;
@@ -79,8 +81,7 @@ export class App implements OnInit {
   }
 
   updateSidebarVisibility(url: string) {
-    // El sidebar solo se muestra si NO estamos en la ruta raíz (selección de consorcio)
-    this.showSidebar = url !== '/';
+    this.showSidebar = url.startsWith('/dashboard/');
     
     if (this.showSidebar) {
       this.checkScreenSize();

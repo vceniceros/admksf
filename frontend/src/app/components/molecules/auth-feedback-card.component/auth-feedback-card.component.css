@@ -1,0 +1,30 @@
+.auth-feedback-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(226, 232, 240, 0.45);
+  color: #334155;
+}
+
+.auth-feedback-card strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-feedback-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.auth-feedback-card.success {
+  background: rgba(220, 252, 231, 0.85);
+  color: #166534;
+}
+
+.auth-feedback-card.error {
+  background: rgba(254, 226, 226, 0.9);
+  color: #b91c1c;
+}

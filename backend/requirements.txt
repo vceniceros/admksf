@@ -6,3 +6,4 @@ django
 google-cloud-vision
 pdf2image
 dj-database-url
+PyJWT

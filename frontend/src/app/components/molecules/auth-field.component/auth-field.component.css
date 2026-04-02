@@ -1,0 +1,27 @@
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-field-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.auth-field-help,
+.auth-field-error {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.auth-field-help {
+  color: #64748b;
+}
+
+.auth-field-error {
+  color: #b91c1c;
+}

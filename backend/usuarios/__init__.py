@@ -1,0 +1,1 @@
+"""App de usuarios y roles del dominio de consorcios."""

@@ -1,8 +1,18 @@
 # diagrama relacional de la bdd
 
-- consorcio(<u>**cuit**</u>, nombre_consorcio, calle, ciudad, numero, codigo_postal, interes_por_mora, redondeo)
+- rol(<u>**id**</u>, nombre)
+
+- - PK: id
+
+- usuario(<u>**id**</u>, correo_electronico, contrasena, ultimo_ingreso, esta_activo, nombre, apellido, <u>_rol_id_</u>)
+
+- - PK: id
+- - FK: rol_id references rol(id)
+
+- consorcio(<u>**cuit**</u>, nombre_consorcio, calle, ciudad, numero, codigo_postal, interes_por_mora, redondeo, <u>_usuario_id_</u>)
 
 - -  PK: cuit
+- -  FK: usuario_id references usuario(id)
 
 - unidad_funcional(<u>**numero de unidad funcional**</u>,<u>**cuit_consorcio**</u>,nombre_unidad, tipo,superficie, prorrateo, <u>_dni_propietario_</u>, estado)
 

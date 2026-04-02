@@ -1,0 +1,78 @@
+<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="auth-form-header">
+    <h2>Crear usuario administrativo</h2>
+    <p>El alta se registra en backend con rol administrador y queda lista para ingresar desde este mismo acceso.</p>
+  </div>
+
+  <div class="auth-form-grid">
+    <app-auth-field
+      label="Nombre"
+      placeholder="Valentina"
+      autocomplete="given-name"
+      [value]="form.controls.nombre.value ?? ''"
+      [error]="getError('nombre')"
+      (valueChange)="updateField('nombre', $event)"
+      (blurInput)="touchField('nombre')"
+    ></app-auth-field>
+
+    <app-auth-field
+      label="Apellido"
+      placeholder="Ceniceros"
+      autocomplete="family-name"
+      [value]="form.controls.apellido.value ?? ''"
+      [error]="getError('apellido')"
+      (valueChange)="updateField('apellido', $event)"
+      (blurInput)="touchField('apellido')"
+    ></app-auth-field>
+  </div>
+
+  <app-auth-field
+    label="Correo electrónico"
+    type="email"
+    inputMode="email"
+    autocomplete="email"
+    placeholder="admin@consorcio.com"
+    [value]="form.controls.correo_electronico.value ?? ''"
+    [error]="getError('correo_electronico')"
+    (valueChange)="updateField('correo_electronico', $event)"
+    (blurInput)="touchField('correo_electronico')"
+  ></app-auth-field>
+
+  <div class="auth-form-grid">
+    <app-auth-field
+      label="Contraseña"
+      type="password"
+      autocomplete="new-password"
+      placeholder="Mínimo 8 caracteres"
+      helpText="Se envía al backend para hash con sal y persistencia segura."
+      [value]="form.controls.contrasena.value ?? ''"
+      [error]="getError('contrasena')"
+      (valueChange)="updateField('contrasena', $event)"
+      (blurInput)="touchField('contrasena')"
+    ></app-auth-field>
+
+    <app-auth-field
+      label="Confirmar contraseña"
+      type="password"
+      autocomplete="new-password"
+      placeholder="Repetí la contraseña"
+      [value]="form.controls.confirmarContrasena.value ?? ''"
+      [error]="getError('confirmarContrasena')"
+      (valueChange)="updateField('confirmarContrasena', $event)"
+      (blurInput)="touchField('confirmarContrasena')"
+    ></app-auth-field>
+  </div>
+
+  <app-auth-feedback-card
+    *ngIf="submitError"
+    title="No pudimos crear la cuenta"
+    [description]="submitError"
+    tone="error"
+  ></app-auth-feedback-card>
+
+  <app-auth-action-button label="Crear cuenta" [loading]="isSubmitting"></app-auth-action-button>
+
+  <button type="button" class="auth-secondary-link" (click)="switchMode.emit()">
+    Ya tengo cuenta y quiero iniciar sesión
+  </button>
+</form>

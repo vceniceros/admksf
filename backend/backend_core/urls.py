@@ -25,6 +25,7 @@ from expensas import views as expensas_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='index.html'), name='frontend'),
+    path('api/usuarios/', include('usuarios.urls')),
     path('api/consorcios/', include('consorcios.urls')),
     path('api/propietarios/', include('propietarios.urls')),
     path('api/proveedores/', include('proveedores.urls')),
