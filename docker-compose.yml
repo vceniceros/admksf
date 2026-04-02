@@ -71,6 +71,7 @@ services:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - N8N_WEBHOOK_SECRET=${N8N_WEBHOOK_SECRET}
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?options=-csearch_path%3D%22consorcio360Bdd%22,consorcio360bdd,public
+      - RESEND_API_KEY=${RESEND_API_KEY}
     # Optimizamos el comando: ahora usa el requirements.txt que vimos en el ls
     command: >
       sh -c "pip install --no-cache-dir -r requirements.txt &&
