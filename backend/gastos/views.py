@@ -16,6 +16,7 @@ from shared.api_responses import exception_response, success_response, validatio
 from shared.auth import ensure_consorcio_access, filter_queryset_by_consorcios, get_request_user
 
 from .services import GastoService
+from .models import Gasto
 from shared.utils import process_file
 
 
@@ -104,7 +105,30 @@ def listar_gastos_por_consorcio(request, cuit_consorcio):
     try:
         usuario_autenticado = get_request_user(request)
         ensure_consorcio_access(usuario_autenticado, cuit_consorcio)
-        gastos = GastoService.listar_gastos_por_consorcio(cuit_consorcio)
+        
+        # Base queryset
+        qs = Gasto.objects.filter(consorcio__cuit=cuit_consorcio)
+        
+        # Filtros opcionales por query params
+        periodo = request.GET.get('periodo')
+        tipo = request.GET.get('tipo_gasto')
+        estado = request.GET.get('estado_pago')
+        
+        if periodo:
+            qs = qs.filter(periodo__startswith=periodo)
+        if tipo:
+            qs = qs.filter(tipo_gasto=tipo)
+        if estado:
+            qs = qs.filter(estado_pago=estado)
+            
+        # Ordenamiento
+        campo = request.GET.get('orden', 'periodo')
+        dir = request.GET.get('dir', 'desc')
+        campos_validos = ['periodo', 'fecha_registro', 'monto', 'tipo_gasto', 'estado_pago']
+        if campo not in campos_validos:
+            campo = 'periodo'
+        qs = qs.order_by(f'-{campo}' if dir == 'desc' else campo)
+
         datos = [{
             "id": g.id_gasto,
             "consorcio": str(g.consorcio.cuit),
@@ -115,7 +139,7 @@ def listar_gastos_por_consorcio(request, cuit_consorcio):
             "tipo_gasto": g.tipo_gasto,
             "estado_pago": g.estado_pago,
             "fecha_registro": g.fecha_registro.isoformat(),
-        } for g in gastos]
+        } for g in qs]
         return success_response(datos, count=len(datos))
     except Exception as e:
         return exception_response(e)

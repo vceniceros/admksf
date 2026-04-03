@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Spend, EstadoPago } from '../../models/spends.model';
 
@@ -17,8 +17,20 @@ export class SpendsService {
     );
   }
 
-  getSpendsByConsortium(cuitConsorcio: string): Observable<Spend[]> {
-    return this.http.get<{ status: string; data: any[] }>(`${this.apiUrl}consorcio/${cuitConsorcio}/`).pipe(
+  getSpendsByConsortium(cuitConsorcio: string, filtros?: {
+    periodo?: string;
+    tipo_gasto?: string;
+    estado_pago?: string;
+    orden?: string;
+    dir?: string;
+  }): Observable<Spend[]> {
+    let params = new HttpParams();
+    if (filtros) {
+      Object.entries(filtros).forEach(([key, value]) => {
+        if (value) params = params.set(key, value);
+      });
+    }
+    return this.http.get<{ status: string; data: any[] }>(`${this.apiUrl}consorcio/${cuitConsorcio}/`, { params }).pipe(
       map(response => (response.data || []).map(item => this.mapSpend(item)))
     );
   }

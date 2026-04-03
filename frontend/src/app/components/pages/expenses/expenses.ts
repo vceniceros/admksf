@@ -8,10 +8,11 @@ import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
 import { SpendingTableComponent } from '../../molecules/spending-table.component/spending-table.component';
 import { switchMap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-expenses',
-  imports: [CommonModule, RouterModule, LabelComponent, IconComponent, SpendingTableComponent],
+  imports: [CommonModule, RouterModule, LabelComponent, IconComponent, SpendingTableComponent, FormsModule],
   templateUrl: './expenses.html',
   styleUrl: './expenses.css',
   standalone: true
@@ -27,6 +28,13 @@ export class Expenses implements OnInit {
 
   showDeleteModal = false;
   spendToDelete: Spend | null = null;
+
+  // Propiedades de filtro
+  filtroPeriodo: string = '';
+  filtroTipo: string = '';
+  filtroEstado: string = '';
+  ordenActual: string = 'periodo';
+  direccion: 'asc' | 'desc' = 'desc';
 
   constructor(
     private route: ActivatedRoute,
@@ -49,7 +57,14 @@ export class Expenses implements OnInit {
         const found = consortia.find(c => c.name.toLowerCase() === decodedName.toLowerCase());
         if (found) {
           this.consortiumId = String(found.id);
-          return this.spendsService.getSpendsByConsortium(this.consortiumId);
+          const filtros: any = {};
+          if (this.filtroPeriodo) filtros.periodo = this.filtroPeriodo;
+          if (this.filtroTipo) filtros.tipo_gasto = this.filtroTipo;
+          if (this.filtroEstado) filtros.estado_pago = this.filtroEstado;
+          filtros.orden = this.ordenActual;
+          filtros.dir = this.direccion;
+          
+          return this.spendsService.getSpendsByConsortium(this.consortiumId, filtros);
         }
         return [];
       })
@@ -68,7 +83,18 @@ export class Expenses implements OnInit {
     if (!this.consortiumId) {
       return;
     }
-    this.spendsService.getSpendsByConsortium(this.consortiumId).subscribe({
+    this.aplicarFiltros();
+  }
+
+  aplicarFiltros(): void {
+    const filtros: any = {};
+    if (this.filtroPeriodo) filtros.periodo = this.filtroPeriodo;
+    if (this.filtroTipo) filtros.tipo_gasto = this.filtroTipo;
+    if (this.filtroEstado) filtros.estado_pago = this.filtroEstado;
+    filtros.orden = this.ordenActual;
+    filtros.dir = this.direccion;
+
+    this.spendsService.getSpendsByConsortium(this.consortiumId, filtros).subscribe({
       next: (data: Spend[]) => {
         this.spends = data;
         this.calculateBalances();
@@ -77,6 +103,26 @@ export class Expenses implements OnInit {
         console.error('Error loading spends:', error);
       }
     });
+  }
+
+  ordenarPor(campo: string): void {
+    if (this.ordenActual === campo) {
+      this.direccion = this.direccion === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.ordenActual = campo;
+      this.direccion = 'desc';
+    }
+    this.aplicarFiltros();
+  }
+
+  limpiarFiltros(): void {
+    this.filtroPeriodo = '';
+    this.filtroTipo = '';
+    this.filtroEstado = '';
+    this.ordenActual = 'periodo';
+    this.direccion = 'desc';
+    // Forzar detección de cambios si el DOM de los selects nativos no se actualiza a tiempo
+    setTimeout(() => this.aplicarFiltros(), 0);
   }
 
   calculateBalances() {
