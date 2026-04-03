@@ -14,6 +14,9 @@ import { PaymentStatusToggleComponent } from '../payment-status-toggle.component
 })
 export class SpendingTableComponent {
   @Input() spends!: Spend[];
+  @Input() ordenActual: string = 'periodo';
+  @Input() direccion: 'asc' | 'desc' = 'desc';
+  @Output() ordenar = new EventEmitter<string>();
   @Output() statusChanged = new EventEmitter<{ spend: Spend; newStatus: EstadoPago }>();
   @Output() editSpend = new EventEmitter<Spend>();
   @Output() deleteSpend = new EventEmitter<Spend>();

@@ -2,13 +2,33 @@
   <table class="spending-table">
     <thead>
       <tr>
-        <th>Período</th>
-        <th>Fecha Registro</th>
-        <th>Tipo Gasto</th>
+        <th (click)="ordenar.emit('periodo')" style="cursor:pointer">
+          Período
+          <span *ngIf="ordenActual === 'periodo'">{{ direccion === 'asc' ? '↑' : '↓' }}</span>
+          <span *ngIf="ordenActual !== 'periodo'">↕</span>
+        </th>
+        <th (click)="ordenar.emit('fecha_registro')" style="cursor:pointer">
+          Fecha Registro
+          <span *ngIf="ordenActual === 'fecha_registro'">{{ direccion === 'asc' ? '↑' : '↓' }}</span>
+          <span *ngIf="ordenActual !== 'fecha_registro'">↕</span>
+        </th>
+        <th (click)="ordenar.emit('tipo_gasto')" style="cursor:pointer">
+          Tipo Gasto
+          <span *ngIf="ordenActual === 'tipo_gasto'">{{ direccion === 'asc' ? '↑' : '↓' }}</span>
+          <span *ngIf="ordenActual !== 'tipo_gasto'">↕</span>
+        </th>
         <th>Descripción</th>
         <th>CUIT Proveedor</th>
-        <th>Monto</th>
-        <th>Estado Pago</th>
+        <th (click)="ordenar.emit('monto')" style="cursor:pointer">
+          Monto
+          <span *ngIf="ordenActual === 'monto'">{{ direccion === 'asc' ? '↑' : '↓' }}</span>
+          <span *ngIf="ordenActual !== 'monto'">↕</span>
+        </th>
+        <th (click)="ordenar.emit('estado_pago')" style="cursor:pointer">
+          Estado Pago
+          <span *ngIf="ordenActual === 'estado_pago'">{{ direccion === 'asc' ? '↑' : '↓' }}</span>
+          <span *ngIf="ordenActual !== 'estado_pago'">↕</span>
+        </th>
         <th class="actions-column">Acciones</th>
       </tr>
     </thead>
