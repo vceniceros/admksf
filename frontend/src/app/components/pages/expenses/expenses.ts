@@ -121,7 +121,8 @@ export class Expenses implements OnInit {
     this.filtroEstado = '';
     this.ordenActual = 'periodo';
     this.direccion = 'desc';
-    this.aplicarFiltros();
+    // Forzar detección de cambios si el DOM de los selects nativos no se actualiza a tiempo
+    setTimeout(() => this.aplicarFiltros(), 0);
   }
 
   calculateBalances() {
