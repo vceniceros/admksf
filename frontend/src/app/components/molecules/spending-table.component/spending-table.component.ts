@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, LOCALE_ID } from '@angular/core';
+import { CommonModule, formatDate } from '@angular/common';
 import { Spend, EstadoPago } from '../../../../models/spends.model';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 import { IconComponent } from '../../atoms/icon.component/icon.component';
@@ -22,10 +22,12 @@ export class SpendingTableComponent {
   @Output() deleteSpend = new EventEmitter<Spend>();
   
   EstadoPago = EstadoPago;
+  
+  private locale = inject(LOCALE_ID);
 
   formatMonth(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    const date = new Date(dateString + 'T12:00:00');
+    return formatDate(date, 'MMMM yyyy', this.locale);
   }
 
   formatDateTime(timestampString: string): string {
