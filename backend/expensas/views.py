@@ -51,8 +51,7 @@ def liquidar_expensa(request):
                     raise ValidationError("El template no pertenece al consorcio indicado.")
 
         resultado = LiquidacionService.liquidar(payload)
-        status_code = 201 if payload.get("cerrar") else 200
-        return success_response(resultado, status=status_code)
+        return success_response(resultado)
     except Exception as exc:
         return exception_response(exc, validation_message="Error de validación al liquidar expensas.")
 
