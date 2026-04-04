@@ -13,10 +13,11 @@ import {
   SettlementTemplate
 } from '../../../../models/settlement.model';
 import { SettlementValuePipe } from '../../../shared/pipes/settlement-value.pipe';
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-settlement',
-  imports: [CommonModule, FormsModule, SettlementValuePipe],
+  imports: [CommonModule, FormsModule, SettlementValuePipe, ToastComponent],
   templateUrl: './settlement.html',
   styleUrl: './settlement.css',
   standalone: true,
@@ -41,6 +42,11 @@ export class SettlementComponent implements OnInit {
   isPreviewLoading = false;
   isClosing = false;
   showTemplateForm = false;
+  isSettlementClosed = false;
+
+  toastMessage = '';
+  toastType: 'success' | 'error' = 'success';
+  showToast = false;
   isEditTemplate = false;
   showDeleteConfirm = false;
   templateToDelete: SettlementTemplate | null = null;
@@ -97,6 +103,7 @@ export class SettlementComponent implements OnInit {
     const payload = this.buildPayload(false);
     this.settlementService.preview(payload).subscribe({
       next: (response) => {
+        this.isSettlementClosed = response.cerrada ?? false;
         this.settlementSubject.next(response);
         this.isPreviewLoading = false;
       },
@@ -114,13 +121,25 @@ export class SettlementComponent implements OnInit {
     const payload = this.buildPayload(true);
     this.settlementService.closeSettlement(payload).subscribe({
       next: (response) => {
-        this.settlementSubject.next(response);
+        this.settlementSubject.next({ ...response, cerrada: true });
+        this.isSettlementClosed = true;
         this.isClosing = false;
+        this.showToastMessage('Liquidación cerrada correctamente', 'success', 4000);
       },
       error: () => {
         this.isClosing = false;
+        this.showToastMessage('Error al cerrar la liquidación. Intente nuevamente.', 'error', 6000);
       }
     });
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error', duration: number): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    setTimeout(() => {
+      this.showToast = false;
+    }, duration);
   }
 
   openTemplateForm(template?: SettlementTemplate): void {
@@ -386,7 +405,8 @@ export class SettlementComponent implements OnInit {
       rows,
       totales: response.totales || {},
       templateId: response.template_id,
-      periodo: response.periodo
+      periodo: response.periodo,
+      cerrada: response.cerrada ?? false
     };
   }
 

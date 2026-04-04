@@ -29,6 +29,7 @@ export interface SettlementResponse {
   columns: SettlementColumn[];
   unidades: SettlementUnitRow[];
   totales: Record<string, string>;
+  cerrada?: boolean;
 }
 
 export interface SettlementTableRow {
@@ -44,4 +45,5 @@ export interface SettlementTableState {
   totales: Record<string, string>;
   templateId: number;
   periodo: string;
+  cerrada?: boolean;
 }
