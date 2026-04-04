@@ -28,13 +28,17 @@
     </button>
   </div>
   <form class="modal-form" [formGroup]="form" (ngSubmit)="submitForm()">
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>CUIT</span>
-      <input type="text" formControlName="cuit" [readonly]="isEditMode" placeholder="20304050607" />
+      <input type="text" formControlName="cuit" [readonly]="isEditMode" placeholder="20304050607" 
+             [class.invalid-input]="form.get('cuit')?.invalid && form.get('cuit')?.touched" />
+      <span class="error-msg" *ngIf="form.get('cuit')?.invalid && form.get('cuit')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Razón social</span>
-      <input type="text" formControlName="razon_social" placeholder="Proveedor SA" />
+      <input type="text" formControlName="razon_social" placeholder="Proveedor SA" 
+             [class.invalid-input]="form.get('razon_social')?.invalid && form.get('razon_social')?.touched" />
+      <span class="error-msg" *ngIf="form.get('razon_social')?.invalid && form.get('razon_social')?.touched">Este campo es requerido</span>
     </label>
     <label class="form-field">
       <span>Teléfono</span>
@@ -44,42 +48,55 @@
       <span>Email</span>
       <input type="email" formControlName="email" placeholder="proveedor@email.com" />
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Calle</span>
-      <input type="text" formControlName="calle" placeholder="Av. Siempre Viva" />
+      <input type="text" formControlName="calle" placeholder="Av. Siempre Viva" 
+             [class.invalid-input]="form.get('calle')?.invalid && form.get('calle')?.touched" />
+      <span class="error-msg" *ngIf="form.get('calle')?.invalid && form.get('calle')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Número</span>
-      <input type="number" formControlName="numero" placeholder="123" />
+      <input type="number" formControlName="numero" placeholder="123" 
+             [class.invalid-input]="form.get('numero')?.invalid && form.get('numero')?.touched" />
+      <span class="error-msg" *ngIf="form.get('numero')?.invalid && form.get('numero')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Código postal</span>
-      <input type="text" formControlName="codigo_postal" placeholder="1414" />
+      <input type="text" formControlName="codigo_postal" placeholder="1414" 
+             [class.invalid-input]="form.get('codigo_postal')?.invalid && form.get('codigo_postal')?.touched" />
+      <span class="error-msg" *ngIf="form.get('codigo_postal')?.invalid && form.get('codigo_postal')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Ciudad</span>
-      <input type="text" formControlName="ciudad" placeholder="Buenos Aires" />
+      <input type="text" formControlName="ciudad" placeholder="Buenos Aires" 
+             [class.invalid-input]="form.get('ciudad')?.invalid && form.get('ciudad')?.touched" />
+      <span class="error-msg" *ngIf="form.get('ciudad')?.invalid && form.get('ciudad')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field">
+    <label class="form-field required-field">
       <span>Tipo de proveedor</span>
-      <select formControlName="tipo_proveedor">
+      <select formControlName="tipo_proveedor" [class.invalid-input]="form.get('tipo_proveedor')?.invalid && form.get('tipo_proveedor')?.touched">
         <option value="" disabled>Seleccionar tipo</option>
         <option *ngFor="let tipo of tipoOptions" [value]="tipo.value">{{ tipo.label }}</option>
       </select>
+      <span class="error-msg" *ngIf="form.get('tipo_proveedor')?.invalid && form.get('tipo_proveedor')?.touched">Este campo es requerido</span>
     </label>
 
-    <label class="form-field" *ngIf="form.get('tipo_proveedor')?.value === 'servicios_mensuales'">
+    <label class="form-field required-field" *ngIf="form.get('tipo_proveedor')?.value === 'servicios_mensuales'">
       <span>Número de cuenta</span>
-      <input type="text" formControlName="numero_cuenta" placeholder="000123" />
+      <input type="text" formControlName="numero_cuenta" placeholder="000123" 
+             [class.invalid-input]="form.get('numero_cuenta')?.invalid && form.get('numero_cuenta')?.touched" />
+      <span class="error-msg" *ngIf="form.get('numero_cuenta')?.invalid && form.get('numero_cuenta')?.touched">Este campo es requerido</span>
     </label>
-    <label class="form-field" *ngIf="form.get('tipo_proveedor')?.value">
+    <label class="form-field required-field" *ngIf="form.get('tipo_proveedor')?.value">
       <span>Teléfono de reclamo</span>
-      <input type="text" formControlName="numero_reclamo" placeholder="0800-123-456" />
+      <input type="text" formControlName="numero_reclamo" placeholder="0800-123-456" 
+             [class.invalid-input]="form.get('numero_reclamo')?.invalid && form.get('numero_reclamo')?.touched" />
+      <span class="error-msg" *ngIf="form.get('numero_reclamo')?.invalid && form.get('numero_reclamo')?.touched">Este campo es requerido</span>
     </label>
 
     <div class="modal-actions">
       <button type="button" class="cancel-button" (click)="closeFormModal()">Cancelar</button>
-      <button type="submit" class="submit-button">Guardar</button>
+      <button type="submit" class="submit-button" [disabled]="form.invalid">Guardar</button>
     </div>
   </form>
 </div>
