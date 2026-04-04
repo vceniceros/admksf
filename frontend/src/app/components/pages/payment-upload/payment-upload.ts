@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentService } from '../../../services/payment.services';
 import { ConsortiumService } from '../../../services/consortium.service';
+import { ApiErrorService } from '../../../services/api-error.service';
 import { LabelComponent } from '../../atoms/label.component/label.component';
 
 @Component({
@@ -25,6 +26,7 @@ export class PaymentUpload implements OnInit {
     private fb: FormBuilder,
     private paymentService: PaymentService,
     private consortiumService: ConsortiumService,
+    private apiErrorService: ApiErrorService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -32,7 +34,7 @@ export class PaymentUpload implements OnInit {
       cuitConsorcio: ['', Validators.required],
       numeroUnidad: ['', [Validators.required, Validators.min(1)]],
       dniPropietario: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-      monto: [0, [Validators.required, Validators.min(0.01)]],
+      monto: ['', [Validators.required, Validators.pattern(/^\d+([.,]\d{1,2})?$/)]],
       estadoPago: ['Pendiente', Validators.required],
       fechaPago: ['']
     });
@@ -98,11 +100,17 @@ export class PaymentUpload implements OnInit {
     }
 
     const formValue = this.paymentForm.value;
+    let normalizedMonto = formValue.monto;
+    if (typeof normalizedMonto === 'string') {
+      normalizedMonto = normalizedMonto.replace(',', '.');
+    }
+    normalizedMonto = Number(normalizedMonto);
+
     const payload = {
       numero_de_unidad_funcional: Number(formValue.numeroUnidad),
       consorcio: formValue.cuitConsorcio,
       propietario: String(formValue.dniPropietario ?? '').trim(),
-      monto: formValue.monto,
+      monto: normalizedMonto,
       estado_pago: formValue.estadoPago,
       fecha_pago: formValue.fechaPago || undefined
     };
@@ -113,6 +121,8 @@ export class PaymentUpload implements OnInit {
           this.router.navigate(['/dashboard', this.consortiumName, 'pagos']);
         },
         error: (error: any) => {
+          const message = this.apiErrorService.extractDetailedMessage(error, 'Error al actualizar pago.');
+          alert(message);
           console.error('Error al actualizar pago:', error);
         }
       });
@@ -124,6 +134,8 @@ export class PaymentUpload implements OnInit {
         this.router.navigate(['/dashboard', this.consortiumName, 'pagos']);
       },
       error: (error: any) => {
+        const message = this.apiErrorService.extractDetailedMessage(error, 'Error al agregar pago.');
+        alert(message);
         console.error('Error al agregar pago:', error);
       }
     });
